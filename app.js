@@ -60,26 +60,32 @@ let srcCanvas = document.getElementById('sourceImage');
 let attemptCanvas = document.getElementById('attempt')
 let destCanvas = document.getElementById('destImage');
 
+let width = 400;
+let height = 400;
 
 // meuk code om de plaatjes in te laden, roept main aan als het klaar is
 let arjen = new Image();
 arjen.onload = () => {
     let ctx = srcCanvas.getContext('2d');
-    srcCanvas.width = arjen.width;
-    srcCanvas.height = arjen.height;
-    ctx.drawImage(arjen, 0, 0);
+    srcCanvas.width = width;
+    srcCanvas.height = height;
+    arjen.width = width;
+    arjen.height = height;
+    ctx.drawImage(arjen, 0, 0, width, height);
 
-    attemptCanvas.width = arjen.width;
-    attemptCanvas.height = arjen.height;
+    attemptCanvas.width = width;
+    attemptCanvas.height = height;
 
     window.sourceImage = new Img(ctx, arjen);
 
     let elena = new Image();
     elena.onload = () => {
         let ctx = destCanvas.getContext('2d');
-        destCanvas.width = elena.width;
-        destCanvas.height = elena.height;
-        ctx.drawImage(elena, 0, 0);
+        destCanvas.width = width;
+        destCanvas.height = height;
+        elena.width = width;
+        elena.height = height;
+        ctx.drawImage(elena, 0, 0, width, height);
 
         window.destImage = new Img(ctx, elena);
         main();
