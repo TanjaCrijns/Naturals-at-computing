@@ -1,11 +1,19 @@
-class SubRegionMutation {
-    constructor(min_size, max_size, sourceImage) {
+function randomRange(min,max) {
+    return Math.random() * (max-min+1) + min;
+}
 
+class SubRegionMutation {
+    constructor(minSize, maxSize, sourceImage) {
+        this.minSize = minSize;
+        this.maxSize = maxSize;
+        this.width = sourceImage.width;
+        this.height = sourceImage.height;
+        this.sourceData = sourceImage.data;
     }
 
     mutate(image) {
-        // pak subregion uit sourceImage
-        // en plak die op image
+        let width = Math.random()
+        let x1 = Math.random() * (this.width - this.maxSize) 
 
     }
 }
@@ -13,7 +21,7 @@ class SubRegionMutation {
 class Img {
 
     constructor(ctx, image) {
-        this.data = ctx.getImageData(0, 0, image.width, image.height);
+        this.data = ctx.getImageData(0, 0, image.width, image.height).data;
         this.width = image.width;
         this.height = image.height;
     }
