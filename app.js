@@ -42,10 +42,18 @@ class GeneticAlgorithm {
 
 function distance(img1, img2) {
     // bereken sum((img1 - img2)^2)
+    let distance = 0;
+    let temp = 0;
+    for (i = 0; i < img1.length; i++) {
+        temp = (img1[i] - img2[i])
+        distance += temp * temp
+    }
+    return distance
 }
 
 function fitness(img1, img2) {
-    // schaal distance naar [0, 1] waarbij 1=goed
+    let fitness = distance(img1,img2)/(255*4*img1.length*img1.width)
+    return fitness;
 }
 
 let srcCanvas = document.getElementById('sourceImage');
