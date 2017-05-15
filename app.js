@@ -43,16 +43,14 @@ class GeneticAlgorithm {
 function distance(img1, img2) {
     // bereken sum((img1 - img2)^2)
     let distance = 0;
-    let temp = 0;
-    for (i = 0; i < img1.length; i++) {
-        temp = (img1[i] - img2[i])
-        distance += temp * temp
+    for (i = 0; i < img1.data.length; i++) {
+        distance += Math.abs(img1[i] - img2[i]);
     }
-    return distance
+    return distance;
 }
 
 function fitness(img1, img2) {
-    let fitness = distance(img1,img2)/(255*4*img1.length*img1.width)
+    let fitness = distance(img1,img2)/(255*4*img1.height*img1.width);
     return fitness;
 }
 
@@ -100,4 +98,5 @@ arjen.src = 'arjen.png';
 function main() {
     console.log(sourceImage);
     console.log(destImage);
+    console.log(fitness(sourceImage, destImage))
 }
