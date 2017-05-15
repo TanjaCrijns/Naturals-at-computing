@@ -4,6 +4,6 @@
 #### We will be using a genetic algorithm to reconstruct images using basic elements of an other image.
 
 run local http server with:
-```
-python -m SimpleHTTPServer
-```
+- python2: `python -m SimpleHTTPServer`
+- python3: `python -m http.server`
+
