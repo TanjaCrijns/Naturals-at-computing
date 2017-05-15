@@ -52,13 +52,13 @@ function distance(img1, img2) {
     // bereken sum((img1 - img2)^2)
     let distance = 0;
     for (i = 0; i < img1.data.length; i++) {
-        distance += Math.abs(img1[i] - img2[i]);
+        distance += Math.abs(img1.data[i] - img2.data[i]);
     }
     return distance;
 }
 
 function fitness(img1, img2) {
-    let fitness = distance(img1,img2)/(255*4*img1.height*img1.width);
+    let fitness = 1 - distance(img1,img2)/(255*4*img1.height*img1.width);
     return fitness;
 }
 
