@@ -30,14 +30,27 @@ class Img {
 
 class GeneticAlgorithm {
 
-    constructor(populationSize, fitnessFunction) { // en nog wat meer parameters
-
+    constructor(populationSize, fitnessFunction, crossoverRate, mutationRate) { // en nog wat meer parameters
+		this.populationSize = populationSize;
+		this.fitnessFunction = fitnessFunction;
+		this.crossoverRate = crossoverRate;
+		this.mutationRate = mutationRate;
     }
 
     run() {
         // draai algorithme
     }
-
+	
+	initializePop() {
+		// initaliseer populatie
+	}
+	
+	evaluatePop() {
+		// evalueer populatie
+	}
+	
+	
+	
 }
 
 function distance(img1, img2) {
