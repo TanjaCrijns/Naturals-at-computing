@@ -14,8 +14,18 @@ class SubRegionMutation {
     mutate(image) {
         let patchWidth = randomRange(this.minSize, this.maxSize);
         let patchHeight = randomRange(this.minSize, this.maxSize);
-        let x = randomRange(0, image.width - patchWidth);
-        let y = randomRange(0, image.height - patchHeight);
+        let xSource = randomRange(0, this.width - patchWidth);
+        let ySource = randomRange(0, this.height - patchHeight);
+        let xDest = randomRange(0, image.width - patchWidth);
+        let yDest = randomRange(0, image.height - patchHeight);
+
+        for (let yy = 0; yy < patchHeight; yy++) {
+            for (let xx = 0; xx < patchWidth; xx++) {
+                image.data[((xx+xDest) + (yy+yDest) * image.width) * 4 + 1] = this.sourceData[((xx+xSource) + (yy+ySource) * image.width) * 4 + 1]
+                image.data[((xx+xDest) + (yy+yDest) * image.width) * 4 + 2] = this.sourceData[((xx+xSource) + (yy+ySource) * image.width) * 4 + 2]
+                image.data[((xx+xDest) + (yy+yDest) * image.width) * 4 + 0] = this.sourceData[((xx+xSource) + (yy+ySource) * image.width) * 4 + 0]
+            }
+        }
 
     }
 }
@@ -23,13 +33,16 @@ class SubRegionMutation {
 class Img {
 
     constructor(ctx, image) {
-        this.data = ctx.getImageData(0, 0, image.width, image.height).data;
+        this.imageData = ctx.getImageData(0, 0, image.width, image.height);
+        console.log(this.imageData);
+        this.data = this.imageData.data;
         this.width = image.width;
         this.height = image.height;
+        this.ctx = ctx;
     }
 
     show() {
-        // teken op canvas dmv context: ctx.setImageData
+        this.ctx.putImageData(this.imageData, 0, 0);
     }
 
     drawRect(rect) {
@@ -51,7 +64,7 @@ class GeneticAlgorithm {
 
     run(stopping_criterion) {
         // draai algorithme
-		while (not stopping_criterion){
+		while (!stopping_criterion){
 			// parents <- selectparents(population)
 			//childern <- []
 			//for(parent1,parent2 <- parents)
@@ -85,7 +98,7 @@ class GeneticAlgorithm {
 	
 	getBestSolution() {
 		// bepaal beste resultaat in de populatie
-		return this.population.getPopulationMax)();
+		return this.population.getPopulationMax();
 	}
 	
 }
@@ -167,6 +180,7 @@ let height = 400;
 
 // meuk code om de plaatjes in te laden, roept main aan als het klaar is
 let arjen = new Image();
+let elena = new Image();
 arjen.onload = () => {
     let ctx = srcCanvas.getContext('2d');
     srcCanvas.width = width;
@@ -180,7 +194,6 @@ arjen.onload = () => {
 
     window.sourceImage = new Img(ctx, arjen);
 
-    let elena = new Image();
     elena.onload = () => {
         let ctx = destCanvas.getContext('2d');
         destCanvas.width = width;
@@ -188,6 +201,9 @@ arjen.onload = () => {
         elena.width = width;
         elena.height = height;
         ctx.drawImage(elena, 0, 0, width, height);
+        attemptCtx = attemptCanvas.getContext('2d');
+        attemptCtx.fillRect(0, 0, width, height);
+        attemptImage = new Img(attemptCtx, attemptCanvas);
 
         window.destImage = new Img(ctx, elena);
         main();
@@ -200,7 +216,9 @@ arjen.src = 'arjen.png';
 
 
 function main() {
-    console.log(sourceImage);
-    console.log(destImage);
-    console.log(fitness(sourceImage, destImage))
+    mutation = new SubRegionMutation(50, 100, sourceImage);
+    for (let i = 0; i < 100; i++) {        
+        mutation.mutate(attemptImage);
+        attemptImage.show();
+    }
 }
