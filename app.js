@@ -40,22 +40,122 @@ class Img {
 
 class GeneticAlgorithm {
 
-    constructor(populationSize, fitnessFunction) { // en nog wat meer parameters
-
+    constructor(populationSize, fitnessFunction, crossoverRate, mutationRate, targetImage) { // en nog wat meer parameters
+		this.populationSize = populationSize;
+		this.fitnessFunction = fitnessFunction;
+		this.crossoverRate = crossoverRate;
+		this.mutationRate = mutationRate;
+		this.targetImage = targetImage;
+		this.population = new Population();
     }
 
-    run() {
+    run(stopping_criterion) {
         // draai algorithme
+		while (not stopping_criterion){
+			// parents <- selectparents(population)
+			//childern <- []
+			//for(parent1,parent2 <- parents)
+				//child1, child2 <- crossover(parent1, parent2, crossoverRate)
+				//children <- mutate(child1,mutationRate)
+				//children <- mutate(child2, mutationRate)
+		}
+		evaluatePop();
+		bestSolution = getBestSolution();
+		//this.population = replace(this.population,children);
     }
+	
+	initializePop() {
+		// initaliseer populatie
+		this.population.initializePop(this.populationSize);
+	}
+	
+	evaluatePop() {
+		// evalueer populatie
+		individuals = this.population.getPopulation();
+		for (var i = 0; j < individuals.length; i++) {
+			individual = individuals[i];
+			individualImage = individual.getImage();
+			individualFitness = fitness(this.targetImage,individualImage);
+			individual.setFitness(individualFitness);
+			if (individualFitness > this.population.max.fitness) {
+				this.population.setPopulationMax(individualFitness,individualImage);
+			}
+		}
+	}
+	
+	getBestSolution() {
+		// bepaal beste resultaat in de populatie
+		return this.population.getPopulationMax)();
+	}
+	
+}
 
+class Population {
+	
+	constructor() {
+		this.individuals = [];
+		this.max = {img: "image_object", fitness: 0};
+	}
+	
+	initializePop(populationSize) {
+		for (var i = 1; i <= this.populationSize; i++) {
+			var individual = new Individual();
+			this.individuals.push(individual);
+		}
+	}
+	
+	getPopulation() {
+		return this.individuals;
+	}
+	
+	setPopulation(individuals) {
+		this.individuals = individuals;
+	}
+	
+	setPopulationMax(maxFitness,img) {
+		this.max.fitness = maxFitness;
+		this.max.img = img;
+	}
+	
+	getPopulationMax() {
+		return this.max;
+	}
+	
+}
+
+class Individual{
+	
+	constructor() {
+		this.image = new Image();
+		this.fitness = 0;
+	}
+	
+	setFitness(newFitness) {
+		this.fitness = newFitness;
+	}
+	
+	getFitness() {
+		return this.fitness;
+	}
+	
+	getImage() {
+		return this.image;
+	}
+	
 }
 
 function distance(img1, img2) {
     // bereken sum((img1 - img2)^2)
+    let distance = 0;
+    for (i = 0; i < img1.data.length; i++) {
+        distance += Math.abs(img1.data[i] - img2.data[i]);
+    }
+    return distance;
 }
 
 function fitness(img1, img2) {
-    // schaal distance naar [0, 1] waarbij 1=goed
+    let fitness = 1 - distance(img1,img2)/(255*4*img1.height*img1.width);
+    return fitness;
 }
 
 let srcCanvas = document.getElementById('sourceImage');
@@ -102,4 +202,5 @@ arjen.src = 'arjen.png';
 function main() {
     console.log(sourceImage);
     console.log(destImage);
+    console.log(fitness(sourceImage, destImage))
 }
