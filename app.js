@@ -1,5 +1,5 @@
 function randomRange(min,max) {
-    return Math.random() * (max-min+1) + min;
+    return Math.floor(Math.random() * (max-min+1) + min);
 }
 
 class SubRegionMutation {
@@ -12,8 +12,10 @@ class SubRegionMutation {
     }
 
     mutate(image) {
-        let width = Math.random()
-        let x1 = Math.random() * (this.width - this.maxSize) 
+        let patchWidth = randomRange(this.minSize, this.maxSize);
+        let patchHeight = randomRange(this.minSize, this.maxSize);
+        let x = randomRange(0, image.width - patchWidth);
+        let y = randomRange(0, image.height - patchHeight);
 
     }
 }
