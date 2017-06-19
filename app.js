@@ -91,6 +91,7 @@ class GeneticAlgorithm {
 		}
 		evaluatePop();
 		bestSolution = getBestSolution();
+		bestSolution.img.show()
     }
 	
 
@@ -358,6 +359,6 @@ function main() {
 }
 
 function startAlgorithm() {
-	ga = new GeneticAlgorithm(100,fitness,elena,arjen,attemptImage);
-	
+	ga = new GeneticAlgorithm(100,fitness,destImage,sourceImage,attemptImage);
+	ga.run()
 }
