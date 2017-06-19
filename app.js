@@ -8,7 +8,7 @@ let images = [
 let MIN_PATCH_SIZE = 5;
 let MAX_PATCH_SIZE = 25;
 let IMAGE_SIZE = 200
-let NUMBER_OF_PARENTS = 5;
+let NUMBER_OF_PARENTS = 20;
 let ELITE = Math.floor(NUMBER_OF_PARENTS/2);
 let TOURNAMENT_SIZE = 10;
 
@@ -38,17 +38,17 @@ function randomRange(min,max) {
     return Math.floor(Math.random() * (max-min) + min);
 }
 
-class subRegionCrossover{
+class SubRegionCrossover{
 	
 	constructor(parent1,parent2){
 		this.child1 = parent1;
 		this.child2 = parent2;
-		this.width = p1_image.width;
-		this.height = p1_image.height;
-		this.source_data1 = p1_image.data;
-		this.dest_data2 = p2_image.data;
-		this.source_data2 = p2_image.data;
-		this.dest_data1 = p1_image.data;
+		this.width = parent1.image.width;
+		this.height = parent1.image.height;
+		this.source_data1 = parent1.image.data;
+		this.dest_data2 = parent2.image.data;
+		this.source_data2 = parent2.image.data;
+		this.dest_data1 = parent1.image.data;
 	}
 	
 	crossover() {
@@ -140,6 +140,7 @@ class GeneticAlgorithm {
         this.sourceImage = sourceImage;
 		this.mutationRate = mutationRate;
 		this.crossoverRate = crossoverRate;
+        console.log(crossoverRate);
         this.numberOfParents = NUMBER_OF_PARENTS;
         this.numberOfChildren = this.populationSize/this.numberOfParents;
         this.iteration = 0;
@@ -167,10 +168,10 @@ class GeneticAlgorithm {
 					let child = new Individual(populationCount,copyAttemptImage,parents[i].getFitness());
 					children.push([populationCount, child]);
 				}
-				for(let j = 0; j < numberOfParents; j = j + 2) {
-					parent1 = parents[j];
-					parent2 = parents[j+1];
-					[child1,child2] = this.crossover(parent1,parent2);
+				for(let j = 0; j < this.numberOfParents; j += 2) {
+					let parent1 = parents[j];
+					let parent2 = parents[j+1];
+					let [child1,child2] = this.crossover(parent1,parent2);
 					populationCount++;
 					child1 = new Individual(populationCount,child1.getImage(),child1.getFitness());
 					children.push([populationCount,child1]);
@@ -188,8 +189,8 @@ class GeneticAlgorithm {
     }
 	
 	crossover(parent1,parent2) {
-		let crossoverComputer = new subRegionCrossover(parent1,parent2);
-		[child1,child2] = crossoverComputer.crossover();
+		let crossoverComputer = new SubRegionCrossover(parent1,parent2);
+		let [child1,child2] = crossoverComputer.crossover();
 		return [child1,child2];
 	}
 
@@ -479,7 +480,6 @@ function showPlot() {
             title: 'Fitness'
         }
     }
-    console.log(data);
 
     chart.draw(data, chartOptions)
 }
