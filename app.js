@@ -38,7 +38,7 @@ class Img {
 
 class GeneticAlgorithm {
 
-    constructor(populationSize, fitnessFunction, crossoverRate, mutationRate, targetImage) { // en nog wat meer parameters
+    constructor(populationSize, fitnessFunction, crossoverRate, mutationRate, targetImage, sourceImage) { // en nog wat meer parameters
 		this.populationSize = populationSize;
 		this.fitnessFunction = fitnessFunction;
 		this.crossoverRate = crossoverRate;
@@ -47,20 +47,9 @@ class GeneticAlgorithm {
 		this.population = new Population();
     }
 
-    run(stopping_criterion) {
-        // draai algorithme
-		while (not stopping_criterion){
-			// parents <- selectparents(population)
-			//childern <- []
-			//for(parent1,parent2 <- parents)
-				//child1, child2 <- crossover(parent1, parent2, crossoverRate)
-				//children <- mutate(child1,mutationRate)
-				//children <- mutate(child2, mutationRate)
-		}
-		evaluatePop();
-		bestSolution = getBestSolution();
-		//this.population = replace(this.population,children);
-    }
+    run() {
+		
+	}
 	
 	initializePop() {
 		// initaliseer populatie
@@ -83,7 +72,7 @@ class GeneticAlgorithm {
 	
 	getBestSolution() {
 		// bepaal beste resultaat in de populatie
-		return this.population.getPopulationMax)();
+		return this.population.getPopulationMax();
 	}
 	
 }
@@ -124,7 +113,7 @@ class Population {
 class Individual{
 	
 	constructor() {
-		this.image = new Image();
+		this.img = new Img();
 		this.fitness = 0;
 	}
 	
@@ -138,6 +127,10 @@ class Individual{
 	
 	getImage() {
 		return this.image;
+	}
+	
+	setImage(img) {
+		this.img = img;
 	}
 	
 }
