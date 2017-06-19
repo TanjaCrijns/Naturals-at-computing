@@ -64,8 +64,7 @@ class GeneticAlgorithm {
 		this.population = new Population(attemptImage);
     }
 
-    run(stopping_criterion) {
-        // draai algorithme
+    run() {
 		numberOfParents = 20;
 		numberOfChildren = this.populationSize/numberOfParents;
 		populationCount = 0;
@@ -75,24 +74,26 @@ class GeneticAlgorithm {
 			for(var i = 1; i <= parents.length; i++) {
 				for(var j = 1; j <=numberOfChildren; j++){
 					populationCount = populationCount++;
-					attemptImage = parents[i].getImage();
-					mutate(attemptImage);
-					parents[i].setId(populationCount);
-					children.append(parents[i]);
+					copyAttemptImage = parents[i].getImage();
+					mutate(copyAttemptImage);
+					child = new Individual(populationCount,copyAttemptImage,parents[i].getFitness());
+					children.append(child);
 				}
 			}
 			this.population.setPopulation(children);
 			this.population.evaluatePop();
+			bestSolution = getBestSolution();
+			bestSolution.img.show();
+			populationCount = 0;
 		}
 		evaluatePop();
 		bestSolution = getBestSolution();
-		//this.population = replace(this.population,children);
     }
 	
 
-	mutate(attemptImage) {
-		subRegionMutator = new subRegionMutation(minSize, maxSize, this.sourceImage);
-		subRegionMutator.mutate(attemptImage)
+	mutate(copyAttemptImage) {
+		subRegionMutator = new subRegionMutation(10, 20, this.sourceImage);
+		subRegionMutator.mutate(copyAttemptImage)
 	}
 	
 
@@ -138,9 +139,6 @@ class GeneticAlgorithm {
     }
 
 
-
-
-
 	initializePop() {
 		// initaliseer populatie
 		this.population.initializePop(this.populationSize);
@@ -171,13 +169,13 @@ class Population {
 	
 	constructor(attemptImage) {
 		this.individuals = [];
-		this.attemptImage = attemptImage;
-		this.max = {img: attemptImage, fitness: 0};
+		this.copyImage = attemptImage.copy();
+		this.max = {img: this.copyImage, fitness: 0};
 	}
 	
 	initializePop(populationSize) {
 		for (var i = 1; i <= this.populationSize; i++) {
-			var individual = new Individual(i,this.attemptImage);
+			var individual = new Individual(i,this.copyImage,0);
 			entry = [i,individual]
 			this.individuals.push(entry);
 		}
@@ -231,11 +229,12 @@ class Population {
 
 class Individual{
 	
-	constructor(id, attemptImage) {
+	constructor(id, copyAttemptImage, fitness) {
 		this.id = id;
-		this.image = attemptImage;
-		this.fitness = 0;
+		this.image = copyAttemptImage;
+		this.fitness = fitness;
 	}
+	
 	
 	getId() {
 		return this.id;
