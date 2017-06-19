@@ -55,30 +55,90 @@ class Img {
 
 class GeneticAlgorithm {
 
-    constructor(populationSize, fitnessFunction, crossoverRate, mutationRate, targetImage) { // en nog wat meer parameters
+    constructor(populationSize, fitnessFunction, targetImage, sourceImage, attemptImage) { // en nog wat meer parameters
 		this.populationSize = populationSize;
 		this.fitnessFunction = fitnessFunction;
 		this.crossoverRate = crossoverRate;
 		this.mutationRate = mutationRate;
 		this.targetImage = targetImage;
-		this.population = new Population();
+		this.population = new Population(attemptImage);
     }
 
-    run(stopping_criterion) {
-        // draai algorithme
-		while (!stopping_criterion){
-			// parents <- selectparents(population)
-			//childern <- []
-			//for(parent1,parent2 <- parents)
-				//child1, child2 <- crossover(parent1, parent2, crossoverRate)
-				//children <- mutate(child1,mutationRate)
-				//children <- mutate(child2, mutationRate)
+    run() {
+		numberOfParents = 20;
+		numberOfChildren = this.populationSize/numberOfParents;
+		populationCount = 0;
+		while (this.population.getPopulationMax > 0.99){
+			parents = rouletteSelection(numberOfParents);
+			childern = [];
+			for(var i = 1; i <= parents.length; i++) {
+				for(var j = 1; j <=numberOfChildren; j++){
+					populationCount = populationCount++;
+					copyAttemptImage = parents[i].getImage();
+					mutate(copyAttemptImage);
+					child = new Individual(populationCount,copyAttemptImage,parents[i].getFitness());
+					children.append(child);
+				}
+			}
+			this.population.setPopulation(children);
+			this.population.evaluatePop();
+			bestSolution = getBestSolution();
+			bestSolution.img.show();
+			populationCount = 0;
 		}
 		evaluatePop();
 		bestSolution = getBestSolution();
-		//this.population = replace(this.population,children);
     }
 	
+
+	mutate(copyAttemptImage) {
+		subRegionMutator = new subRegionMutation(10, 20, this.sourceImage);
+		subRegionMutator.mutate(copyAttemptImage)
+	}
+	
+
+    rouletteSelection(numberOfParents) {
+        let totalFitness = 0;
+        let proportionList = [];
+        let individuals = population.getSortedIndividuals();
+        let parents = [];
+
+        for (let i = 0; i < individuals.length; i++) {
+            totalFitness += individuals[i].getFitness();   
+        }
+        for (let j = 0; j < individuals.length; j++) {
+            proportionList.push(individuals[j].getFitness() / totalFitness);
+        }
+        for (let k = 0; k < numberOfParents; k++) {
+            let idx = selectByProportion(proportionList);
+            parents.push(individuals[idx]);
+            individuals.splice(idx, 1);
+            proportionList.splice(idx, 1);
+        }
+
+        return parents;
+
+    }
+
+    selectByProportion(proportionList) {
+        let randomNumber = randomRange(0,1);
+        let choice = null;
+        for (let i = 0; i < proportionList.length; i++) {
+            randomNumber -= proportionList[i]
+            if (randomNumber <= 0) {
+                choice = i ;
+                break; 
+            }
+        }
+        return choice;
+    }
+
+    eliteSelection(numberOfParents) {
+        let individuals = population.getSortedIndividuals();
+        return individuals.slice(0,numberOfParents);
+    }
+
+
 	initializePop() {
 		// initaliseer populatie
 		this.population.initializePop(this.populationSize);
@@ -90,7 +150,7 @@ class GeneticAlgorithm {
 		for (var i = 0; j < individuals.length; i++) {
 			individual = individuals[i];
 			individualImage = individual.getImage();
-			individualFitness = fitness(this.targetImage,individualImage);
+			individualFitness = fitnessFunction(this.targetImage,individualImage);
 			individual.setFitness(individualFitness);
 			if (individualFitness > this.population.max.fitness) {
 				this.population.setPopulationMax(individualFitness,individualImage);
@@ -107,15 +167,17 @@ class GeneticAlgorithm {
 
 class Population {
 	
-	constructor() {
+	constructor(attemptImage) {
 		this.individuals = [];
-		this.max = {img: "image_object", fitness: 0};
+		this.copyImage = attemptImage.copy();
+		this.max = {img: this.copyImage, fitness: 0};
 	}
 	
 	initializePop(populationSize) {
 		for (var i = 1; i <= this.populationSize; i++) {
-			var individual = new Individual();
-			this.individuals.push(individual);
+			var individual = new Individual(i,this.copyImage,0);
+			entry = [i,individual]
+			this.individuals.push(entry);
 		}
 	}
 	
@@ -136,25 +198,66 @@ class Population {
 		return this.max;
 	}
 	
+	sortFitnessScores(){
+		scores = [];
+		for (var i = 1; i <= this.individuals.length; i++) {
+			score = this.individuals[i].getFitness();
+			id = this.individuals[i].getId();
+			entry = [id,score];
+			scores.push(entry)
+		}
+		scores = scores.sort(function(a,b){return a[1]>b[1];});
+		return scores;
+	}
+	
+	getSortedIndividuals() {
+		sortedIndividuals = [];
+		sortedScores = sortFitnessScores();
+		for(var i = 1; i <= sortedScores.length; i++) {
+			[id,score] = sortedScores[i];
+			for(var j = 1; j <= this.individuals.length; j++) {
+				[individual_id,individual] = this.individuals[j];
+				if (id == individual_id) {
+					sortedIndividuals.push(individual);
+				}
+			}
+		}
+		return sortedIndividuals;
+	}
+	
 }
 
 class Individual{
 	
-	constructor() {
-		this.image = new Image();
-		this.fitness = 0;
+	constructor(id, copyAttemptImage, fitness) {
+		this.id = id;
+		this.image = copyAttemptImage;
+		this.fitness = fitness;
+	}
+	
+	
+	getId() {
+		return this.id;
+	}
+	
+	setId(id) {
+		this.id = id;
 	}
 	
 	setFitness(newFitness) {
 		this.fitness = newFitness;
 	}
-	
+
 	getFitness() {
 		return this.fitness;
 	}
 	
 	getImage() {
 		return this.image;
+	}
+	
+	setImage(img) {
+		this.image = img;
 	}
 	
 }
