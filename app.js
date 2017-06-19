@@ -457,7 +457,7 @@ function main() {
 function startAlgorithm() {
     let iterationNumber = document.getElementById('iteration-number');
     let allTimeBest = document.getElementById('all-time-best');
-	ga = new GeneticAlgorithm(100,fitness,destImage,sourceImage,attemptImage);
+	ga = new GeneticAlgorithm(100,fitness,destImage,sourceImage,attemptImage,0.8,0.2);
     let runAlgorithm = () => {
         ga.doIteration();
         iterationNumber.innerHTML = ga.iteration;
