@@ -4,6 +4,8 @@
         <title>Natural computing: Genetic Algorithm Image Mosaics</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" type="text/css">
         <link rel="stylesheet" href="style.css" type="text/css">
+            <!--Load the AJAX API-->
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     </head>
     <body>
         <div class="container">
@@ -48,8 +50,10 @@
 
             Iteration: <span id='iteration-number'></span><br>
             All time best: <span id='all-time-best'></span><br>
+            <input type="button" onclick="showPlot()" class="button-primary" value="Show plot">
+            <div id="chart">
+            </div>
         </div>
-        
         <script src="app.js"></script>
     </body>
 </html>

@@ -10,6 +10,12 @@ let MAX_PATCH_SIZE = 25;
 let IMAGE_SIZE = 200
 let NUMBER_OF_PARENTS = 5;
 
+function createData() {
+    window.chart = new google.visualization.LineChart(document.getElementById('chart'));
+}
+
+google.charts.load('current', {'packages':['corechart']});
+google.charts.setOnLoadCallback(createData);
 
 
 let sourceImageSelector = document.getElementById('source-image-selection');
@@ -27,7 +33,7 @@ for (image of images) {
 }
 
 function randomRange(min,max) {
-    return Math.floor(Math.random() * (max-min+1) + min);
+    return Math.floor(Math.random() * (max-min) + min);
 }
 
 class SubRegionMutation {
@@ -124,6 +130,7 @@ class GeneticAlgorithm {
 				}
 			}
 			this.population.setPopulation(children);
+            console.log(children.length);
 			this.evaluatePop();
 			let bestSolution = this.getBestSolution();
 			bestSolution.img.show();
@@ -403,6 +410,31 @@ function main() {
     // }
 }
 
+function showPlot() {
+    let data = new google.visualization.DataTable();
+    data.addColumn('number', 'Iteration');
+    data.addColumn('number', 'Fitness');
+    let i = 0;
+    while (fitnesses[i] != 0) {
+        data.addRow([i, fitnesses[i]]);
+        i++;
+    }
+
+    let chartOptions = {
+        hAxis: {
+            title: 'Iteration'
+        },
+        vAxis: {
+            title: 'Fitness'
+        }
+    }
+    console.log(data);
+
+    chart.draw(data, chartOptions)
+}
+
+fitnesses = new Float32Array(1000000);
+
 function startAlgorithm() {
     let iterationNumber = document.getElementById('iteration-number');
     let allTimeBest = document.getElementById('all-time-best');
@@ -410,7 +442,9 @@ function startAlgorithm() {
     let runAlgorithm = () => {
         ga.doIteration();
         iterationNumber.innerHTML = ga.iteration;
-        allTimeBest.innerHTML = ga.getBestSolution().fitness;
+        let fitness = ga.getBestSolution().fitness;
+        allTimeBest.innerHTML = fitness;
+        fitnesses[ga.iteration - 1] = fitness;
         window.requestAnimationFrame(runAlgorithm);
     }
     runAlgorithm();
