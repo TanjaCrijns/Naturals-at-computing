@@ -45,11 +45,22 @@
                         </select>
                 </div>
             </div>
-
-            Iteration: <span id='iteration-number'></span><br>
-            All time best: <span id='all-time-best'></span><br>
-            <input type="button" onclick="showPlot()" class="button-primary" value="Show plot">
-            <div id="chart">
+            <div class="row">
+            <div class="one-half column">
+                Iteration: <span id='iteration-number'></span><br>
+                All time best: <span id='all-time-best'></span><br><br><br>
+            
+                <input type="button" onclick="showPlot()" class="button-primary" value="Show plot">
+                <div id="chart">
+                </div>
+            </div>
+            <div class="one-half column">
+                <label for="selection-algorithm">Selection algorithm: </label>
+                <select class="" id="selection-algorithm">
+                            <option value="tournament">Tournament selection</option>
+                            <option value="roulette">Roulette wheel selection</option>
+                </select>
+            </div>
             </div>
         </div>
         

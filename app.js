@@ -152,7 +152,7 @@ class Img {
 
 class GeneticAlgorithm {
 
-    constructor(populationSize, fitnessFunction, targetImage, sourceImage, attemptImage, mutationRate) {
+    constructor(populationSize, fitnessFunction, targetImage, sourceImage, attemptImage, mutationRate, selectionAlgo) {
 		this.populationSize = populationSize;
 		this.fitnessFunction = fitnessFunction;
 		this.targetImage = targetImage;
@@ -162,6 +162,10 @@ class GeneticAlgorithm {
         this.numberOfParents = NUMBER_OF_PARENTS;
         this.numberOfChildren = this.populationSize/this.numberOfParents;
         this.iteration = 0;
+        if (selectionAlgo == 'tournament')
+            this.doSelection = this.tournamentSelection;
+        else if (selectionAlgo == 'roulette')
+            this.doSelection = this.rouletteSelection;
 		this.initializePop();
 		this.evaluatePop();
     }
@@ -173,8 +177,8 @@ class GeneticAlgorithm {
     }
 
     doIteration() {
-            console.log('Iteration' + ++this.iteration);
-			let parents = this.tournamentSelection();
+            console.log('Iteration ' + ++this.iteration);
+			let parents = this.doSelection();
 			let children = [];
             let populationCount = 0;
 			let numberOfMutationChildren = (this.populationSize*this.mutationRate)/this.numberOfParents;
@@ -187,8 +191,6 @@ class GeneticAlgorithm {
 					children.push([populationCount, child]);
 				}
             }
-            console.log(children.length);
-            console.log(this.populationSize)
             let nChildren = children.length;
 			for(let j = 0; j < this.populationSize - nChildren; j += 2) {
                 let firstParentIdx = randomRange(0, parents.length);
@@ -207,11 +209,9 @@ class GeneticAlgorithm {
                 children.push([populationCount,child2]);
 			}
 			this.population.setPopulation(children);
-            console.log(children.length);
 			this.evaluatePop();
 			let bestSolution = this.getBestSolution();
 			bestSolution.img.show();
-            console.log(bestSolution.fitness);
     }
 	
 	crossover(parent1,parent2) {
@@ -499,6 +499,8 @@ function showPlot() {
     }
 
     let chartOptions = {
+        width: 500,
+        height:400,
         hAxis: {
             title: 'Iteration'
         },
@@ -515,7 +517,9 @@ fitnesses = new Float32Array(1000000);
 function startAlgorithm() {
     let iterationNumber = document.getElementById('iteration-number');
     let allTimeBest = document.getElementById('all-time-best');
-	ga = new GeneticAlgorithm(100,fitness,destImage,sourceImage,attemptImage,0.8);
+    let algoElement = document.getElementById('selection-algorithm');
+    let selectionAlgo = algoElement.options[algoElement.selectedIndex].value;
+	ga = new GeneticAlgorithm(100,fitness,destImage,sourceImage,attemptImage,0.8, selectionAlgo);
     let runAlgorithm = () => {
         ga.doIteration();
         iterationNumber.innerHTML = ga.iteration;
