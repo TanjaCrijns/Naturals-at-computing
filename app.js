@@ -1,9 +1,16 @@
-images = [
+let images = [
     'Elena',
     'Arjen',
     'Monalisa',
     'Trump',
 ];
+
+let MIN_PATCH_SIZE = 5;
+let MAX_PATCH_SIZE = 25;
+let IMAGE_SIZE = 200
+let NUMBER_OF_PARENTS = 5;
+
+
 
 let sourceImageSelector = document.getElementById('source-image-selection');
 let targetImageSelector = document.getElementById('target-image-selection');
@@ -87,7 +94,7 @@ class GeneticAlgorithm {
 		this.targetImage = targetImage;
 		this.population = new Population(attemptImage);
         this.sourceImage = sourceImage;
-        this.numberOfParents = 20;
+        this.numberOfParents = NUMBER_OF_PARENTS;
         this.numberOfChildren = this.populationSize/this.numberOfParents;
         this.iteration = 0;
         
@@ -125,7 +132,7 @@ class GeneticAlgorithm {
 	
 
 	mutate(copyAttemptImage) {
-		let subRegionMutator = new SubRegionMutation(10, 20, this.sourceImage);
+		let subRegionMutator = new SubRegionMutation(MIN_PATCH_SIZE, MAX_PATCH_SIZE, this.sourceImage);
 		subRegionMutator.mutate(copyAttemptImage)
 	}
 	
@@ -348,8 +355,8 @@ let srcCanvas = document.getElementById('sourceImage');
 let attemptCanvas = document.getElementById('attempt')
 let destCanvas = document.getElementById('destImage');
 
-let width = 300;
-let height = 300;
+let width = IMAGE_SIZE;
+let height = IMAGE_SIZE;
 
 // meuk code om de plaatjes in te laden, roept main aan als het klaar is
 let arjen = new Image();
