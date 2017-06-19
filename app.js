@@ -115,6 +115,13 @@ class GeneticAlgorithm {
         return choice;
     }
 
+    eliteSelection(numberOfParents) {
+        let individuals = population.getSortedIndividuals();
+        return individuals.slice(0,numberOfParents);
+    }
+
+
+
 
 	initializePop() {
 		// initaliseer populatie
