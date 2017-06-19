@@ -141,6 +141,28 @@ class GeneticAlgorithm {
         return individuals.slice(0,numberOfParents);
     }
 
+    tournamentSelection(numberOfParents, tournamentSize) {
+        let individuals = population.getSortedIndividuals();
+        let parents = [];
+		for (var i = 0; i < numberOfParents; i++) {
+            let gladiators = [];
+            let gladiatorIDXs = [];
+		    for (var j = 0; j < tournamentSize; j++) {
+                randomNumber = randomRange(0, population.populationSize);
+                gladiators.push(individuals[randomNumber].getFitness());
+                gladiatorIDXs.push(randomNumber);
+            }
+            let max = gladiators[0];
+            let maxIDX = gladiatorIDXs[0]
+            for (var k = 0; k < gladiators.length; k++) {
+                if (gladiators[k] > max) {
+                    max = gladiators[k];
+                    maxIDX = gladiatorIDXs[k];
+                }
+            parents.push(individuals[maxIDX]);
+        }
+        return parents
+    }
 
 	initializePop() {
 		// initaliseer populatie
