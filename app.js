@@ -32,12 +32,12 @@ class SubRegionMutation {
 
 class Img {
 
-    constructor(ctx, image) {
-        this.imageData = ctx.getImageData(0, 0, image.width, image.height);
+    constructor(ctx, width, height, imageData) {
+        this.imageData = imageData;
         console.log(this.imageData);
-        this.data = this.imageData.data;
-        this.width = image.width;
-        this.height = image.height;
+        this.data = imageData.data;
+        this.width = width;
+        this.height = height;
         this.ctx = ctx;
     }
 
@@ -45,8 +45,10 @@ class Img {
         this.ctx.putImageData(this.imageData, 0, 0);
     }
 
-    drawRect(rect) {
-        // krijgt rectangle, tekent die op plaatje
+    copy() {
+        let imageData = this.ctx.createImageData(this.width, this.height)
+        let newImage = new Img(this.ctx, this.width, this.height, imageData);
+        return newImage;
     }
 
 }
@@ -192,7 +194,7 @@ arjen.onload = () => {
     attemptCanvas.width = width;
     attemptCanvas.height = height;
 
-    window.sourceImage = new Img(ctx, arjen);
+    window.sourceImage = new Img(ctx, width, height, ctx.getImageData(0, 0, width, height));
 
     elena.onload = () => {
         let ctx = destCanvas.getContext('2d');
@@ -203,9 +205,9 @@ arjen.onload = () => {
         ctx.drawImage(elena, 0, 0, width, height);
         attemptCtx = attemptCanvas.getContext('2d');
         attemptCtx.fillRect(0, 0, width, height);
-        attemptImage = new Img(attemptCtx, attemptCanvas);
+        attemptImage = new Img(attemptCtx, width, height, attemptCtx.getImageData(0, 0, width, height));
 
-        window.destImage = new Img(ctx, elena);
+        window.destImage = new Img(ctx, width, height, ctx.getImageData(0, 0, width, height));
         main();
     };
     elena.src = 'elena.png';
