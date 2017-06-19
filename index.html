@@ -4,8 +4,6 @@
         <title>Natural computing: Genetic Algorithm Image Mosaics</title>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" type="text/css">
         <link rel="stylesheet" href="style.css" type="text/css">
-            <!--Load the AJAX API-->
-        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     </head>
     <body>
         <div class="container">
@@ -22,28 +20,28 @@
                 </div>
             </div>
             <div class="row">
-                <div class="one-third column">
+                <div class="one-third column button-wrapper">
                     <canvas id="sourceImage"></canvas>
                 </div>
-                <div class="one-third column">
+                <div class="one-third column button-wrapper">
                     <canvas id="attempt"></canvas>
                 </div>
-                <div class="one-third column">
+                <div class="one-third column button-wrapper">
                     <canvas id="destImage"></canvas>
                 </div>
             </div>
             <div class="row">
                     <div class="one-third column button-wrapper">
-                        <select class="" id="source-image-selection">
-                            <option>Select an image</option>
+                        <select class="" id="source-image-selection" onchange="loadImage('source')">
+                            <option selected disabled>Select an image</option>
                         </select>
                     </div>
                 <div class="one-third column button-wrapper">
                     <input type="button" value="Start" class="button-primary" onclick="startAlgorithm()">
                 </div>
                 <div class="one-third column button-wrapper">
-                        <select class="" id="target-image-selection">
-                            <option>Select an image</option>
+                        <select class="" id="target-image-selection" onchange="loadImage('target')">
+                            <option selected disabled>Select an image</option>
                         </select>
                 </div>
             </div>
@@ -54,6 +52,9 @@
             <div id="chart">
             </div>
         </div>
+        
+        <!--Load the AJAX API-->
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
         <script src="app.js"></script>
     </body>
 </html>

@@ -3,6 +3,7 @@ let images = [
     'Arjen',
     'Monalisa',
     'Trump',
+    'Circle',
 ];
 
 let MIN_PATCH_SIZE = 5;
@@ -34,6 +35,27 @@ for (image of images) {
     targetImageSelector.appendChild(toption);
 }
 
+function loadImage(e) {
+    let image = new Image();
+    let el = document.getElementById(e + '-image-selection');
+    let imageName = el.options[el.selectedIndex].value;
+    image.onload = () => {
+        image.width = IMAGE_SIZE;
+        image.height = IMAGE_SIZE;
+        let canvas = e == 'source' ? srcCanvas : destCanvas;
+        let ctx = canvas.getContext('2d');
+        ctx.drawImage(image, 0, 0, image.width, image.height);
+        let img = new Img(ctx, IMAGE_SIZE, IMAGE_SIZE, ctx.getImageData(0, 0, IMAGE_SIZE, IMAGE_SIZE));
+        if (e == 'source') {
+            sourceImage = img;
+        } else {
+            targetImage = img;
+        }
+    }
+    image.src = imageName;
+
+}
+
 function randomRange(min,max) {
     return Math.floor(Math.random() * (max-min) + min);
 }
@@ -56,13 +78,16 @@ class SubRegionCrossover{
 		let yDest = 0;
 		for(let yy = 0; yy < patchHeight; yy++) {
 			for (let xx = 0; xx < patchWidth; xx++) {
-				this.child2.getImage().data[((xx+xDest) + (yy+yDest) * IMAGE_SIZE) * 4 + 1] = this.child1.getImage().data[((xx+xSource) + (yy+ySource) * IMAGE_SIZE) * 4 + 1]
+                let temp1 = this.child2.getImage().data[((xx+xDest) + (yy+yDest) * IMAGE_SIZE) * 4 + 0];
+                let temp2 = this.child2.getImage().data[((xx+xDest) + (yy+yDest) * IMAGE_SIZE) * 4 + 1];
+                let temp3 = this.child2.getImage().data[((xx+xDest) + (yy+yDest) * IMAGE_SIZE) * 4 + 2];
+				this.child2.getImage().data[((xx+xDest) + (yy+yDest) * IMAGE_SIZE) * 4 + 0] = this.child1.getImage().data[((xx+xSource) + (yy+ySource) * IMAGE_SIZE) * 4 + 0]
+                this.child2.getImage().data[((xx+xDest) + (yy+yDest) * IMAGE_SIZE) * 4 + 1] = this.child1.getImage().data[((xx+xSource) + (yy+ySource) * IMAGE_SIZE) * 4 + 1]
                 this.child2.getImage().data[((xx+xDest) + (yy+yDest) * IMAGE_SIZE) * 4 + 2] = this.child1.getImage().data[((xx+xSource) + (yy+ySource) * IMAGE_SIZE) * 4 + 2]
-                this.child2.getImage().data[((xx+xDest) + (yy+yDest) * IMAGE_SIZE) * 4 + 0] = this.child1.getImage().data[((xx+xSource) + (yy+ySource) * IMAGE_SIZE) * 4 + 0]
 				
-				this.child1.getImage().data[((xx+xDest) + (yy+yDest) * IMAGE_SIZE) * 4 + 1] = this.child2.getImage().data[((xx+xSource) + (yy+ySource) * IMAGE_SIZE) * 4 + 1]
-                this.child1.getImage().data[((xx+xDest) + (yy+yDest) * IMAGE_SIZE) * 4 + 2] = this.child2.getImage().data[((xx+xSource) + (yy+ySource) * IMAGE_SIZE) * 4 + 2]
-                this.child1.getImage().data[((xx+xDest) + (yy+yDest) * IMAGE_SIZE) * 4 + 0] = this.child2.getImage().data[((xx+xSource) + (yy+ySource) * IMAGE_SIZE) * 4 + 0]
+                this.child1.getImage().data[((xx+xDest) + (yy+yDest) * IMAGE_SIZE) * 4 + 0] = temp1;
+				this.child1.getImage().data[((xx+xDest) + (yy+yDest) * IMAGE_SIZE) * 4 + 1] = temp2;
+                this.child1.getImage().data[((xx+xDest) + (yy+yDest) * IMAGE_SIZE) * 4 + 2] = temp3;
 			}
 		}
 		return [this.child1,this.child2]
@@ -459,8 +484,8 @@ arjen.src = 'arjen.png';
 
 
 function main() {
-    mutation = new SubRegionCrossover(new Individual(0, sourceImage, 1), new Individual(3, destImage, 2));
-    [window.child1, window.child2] = mutation.crossover();
+    // mutation = new SubRegionCrossover(new Individual(0, sourceImage, 1), new Individual(3, destImage, 2));
+    // [window.child1, window.child2] = mutation.crossover();
 }
 
 function showPlot() {
