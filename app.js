@@ -9,7 +9,8 @@ let MIN_PATCH_SIZE = 5;
 let MAX_PATCH_SIZE = 25;
 let IMAGE_SIZE = 200
 let NUMBER_OF_PARENTS = 5;
-let ELITE = Math.floor(NUMBER_OF_PARENTS/2)
+let ELITE = Math.floor(NUMBER_OF_PARENTS/2);
+let TOURNAMENT_SIZE = 10;
 
 
 
@@ -111,7 +112,7 @@ class GeneticAlgorithm {
 
     doIteration() {
             console.log('Iteration' + ++this.iteration);
-			let parents = this.eliteSelection(this.numberOfParents);
+			let parents = this.tournamentSelection();
 			let children = [];
             let populationCount = 0;
 
@@ -151,7 +152,7 @@ class GeneticAlgorithm {
             proportionList.push(individuals[i].getFitness() / totalFitness);
         }
         
-        for (let i = 0; i < this.numberOfParents; i++) {
+        for (let i = 0; i < (this.numberOfParents - ELITE); i++) {
             let idx = this.selectByProportion(proportionList);
             parents.push(individuals[idx]);
             individuals.splice(idx, 1);
@@ -179,14 +180,15 @@ class GeneticAlgorithm {
         return choice;
     }
 
-    tournamentSelection(tournamentSize) {
-        let individuals = population.getSortedIndividuals();
+    tournamentSelection() {
+        let individuals = this.population.getSortedIndividuals();
         let parents = individuals.splice(0, ELITE);
-		for (var i = 0; i < this.numberOfParents; i++) {
+
+		for (var i = 0; i < (this.numberOfParents - ELITE); i++) {
             let gladiators = [];
             let gladiatorIDXs = [];
-		    for (var j = 0; j < tournamentSize; j++) {
-                let randomNumber = randomRange(0, population.populationSize);
+		    for (var j = 0; j < TOURNAMENT_SIZE; j++) {
+                let randomNumber = randomRange(0, (this.populationSize - ELITE - 1));
                 gladiators.push(individuals[randomNumber].getFitness());
                 gladiatorIDXs.push(randomNumber);
             }
