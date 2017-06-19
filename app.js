@@ -69,7 +69,7 @@ class GeneticAlgorithm {
 		numberOfChildren = this.populationSize/numberOfParents;
 		populationCount = 0;
 		while (this.population.getPopulationMax > 0.99){
-			parents = tournamentSelection(numberOfParents);
+			parents = rouletteSelection(numberOfParents);
 			childern = [];
 			for(var i = 1; i <= parents.length; i++) {
 				for(var j = 1; j <=numberOfChildren; j++){
