@@ -89,11 +89,58 @@ class GeneticAlgorithm {
 		//this.population = replace(this.population,children);
     }
 	
+<<<<<<< HEAD
 	mutate(attemptImage) {
 		subRegionMutator = new subRegionMutation(minSize, maxSize, this.sourceImage);
 		subRegionMutator.mutate(attemptImage)
 	}
 	
+=======
+    rouletteSelection(numberOfParents) {
+        let totalFitness = 0;
+        let proportionList = [];
+        let individuals = population.getSortedIndividuals();
+        let parents = [];
+
+        for (let i = 0; i < individuals.length; i++) {
+            totalFitness += individuals[i].getFitness();   
+        }
+        for (let j = 0; j < individuals.length; j++) {
+            proportionList.push(individuals[j].getFitness() / totalFitness);
+        }
+        for (let k = 0; k < numberOfParents; k++) {
+            let idx = selectByProportion(proportionList);
+            parents.push(individuals[idx]);
+            individuals.splice(idx, 1);
+            proportionList.splice(idx, 1);
+        }
+
+        return parents;
+
+    }
+
+    selectByProportion(proportionList) {
+        let randomNumber = randomRange(0,1);
+        let choice = null;
+        for (let i = 0; i < proportionList.length; i++) {
+            randomNumber -= proportionList[i]
+            if (randomNumber <= 0) {
+                choice = i ;
+                break; 
+            }
+        }
+        return choice;
+    }
+
+    eliteSelection(numberOfParents) {
+        let individuals = population.getSortedIndividuals();
+        return individuals.slice(0,numberOfParents);
+    }
+
+
+
+
+>>>>>>> 43ffc3f947ef391fd8e3956dc2f81634ada535bb
 	initializePop() {
 		// initaliseer populatie
 		this.population.initializePop(this.populationSize);
@@ -201,7 +248,7 @@ class Individual{
 	setFitness(newFitness) {
 		this.fitness = newFitness;
 	}
-	
+
 	getFitness() {
 		return this.fitness;
 	}
@@ -217,7 +264,6 @@ class Individual{
 }
 
 function distance(img1, img2) {
-    // bereken sum((img1 - img2)^2)
     let distance = 0;
     for (i = 0; i < img1.data.length; i++) {
         distance += Math.abs(img1.data[i] - img2.data[i]);
