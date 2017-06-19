@@ -41,14 +41,10 @@ function randomRange(min,max) {
 class SubRegionCrossover{
 	
 	constructor(parent1,parent2){
-		this.child1 = parent1;
-		this.child2 = parent2;
+		this.child1 = parent1.copy();
+		this.child2 = parent2.copy();
 		this.width = parent1.image.width;
 		this.height = parent1.image.height;
-		this.source_data1 = parent1.image.data;
-		this.dest_data2 = parent2.image.data;
-		this.source_data2 = parent2.image.data;
-		this.dest_data1 = parent1.image.data;
 	}
 	
 	crossover() {
@@ -58,16 +54,15 @@ class SubRegionCrossover{
         let ySource = 0;
         let xDest = 0;
 		let yDest = 0;
-		
 		for(let yy = 0; yy < patchHeight; yy++) {
 			for (let xx = 0; xx < patchWidth; xx++) {
-				this.child2.getImage().data[((xx+xDest) + (yy+yDest) * image.width) * 4 + 1] = this.child1.getImage().data[((xx+xSource) + (yy+ySource) * image.width) * 4 + 1]
-                this.child2.getImage().data[((xx+xDest) + (yy+yDest) * image.width) * 4 + 2] = this.child1.getImage().data[((xx+xSource) + (yy+ySource) * image.width) * 4 + 2]
-                this.child2.getImage().data[((xx+xDest) + (yy+yDest) * image.width) * 4 + 0] = this.child1.getImage().data[((xx+xSource) + (yy+ySource) * image.width) * 4 + 0]
+				this.child2.getImage().data[((xx+xDest) + (yy+yDest) * IMAGE_SIZE) * 4 + 1] = this.child1.getImage().data[((xx+xSource) + (yy+ySource) * IMAGE_SIZE) * 4 + 1]
+                this.child2.getImage().data[((xx+xDest) + (yy+yDest) * IMAGE_SIZE) * 4 + 2] = this.child1.getImage().data[((xx+xSource) + (yy+ySource) * IMAGE_SIZE) * 4 + 2]
+                this.child2.getImage().data[((xx+xDest) + (yy+yDest) * IMAGE_SIZE) * 4 + 0] = this.child1.getImage().data[((xx+xSource) + (yy+ySource) * IMAGE_SIZE) * 4 + 0]
 				
-				this.child1.getImage().data[((xx+xDest) + (yy+yDest) * image.width) * 4 + 1] = this.child2.getImage().data[((xx+xSource) + (yy+ySource) * image.width) * 4 + 1]
-                this.child1.getImage().data[((xx+xDest) + (yy+yDest) * image.width) * 4 + 2] = this.child2.getImage().data[((xx+xSource) + (yy+ySource) * image.width) * 4 + 2]
-                this.child1.getImage().data[((xx+xDest) + (yy+yDest) * image.width) * 4 + 0] = this.child2.getImage().data[((xx+xSource) + (yy+ySource) * image.width) * 4 + 0]
+				this.child1.getImage().data[((xx+xDest) + (yy+yDest) * IMAGE_SIZE) * 4 + 1] = this.child2.getImage().data[((xx+xSource) + (yy+ySource) * IMAGE_SIZE) * 4 + 1]
+                this.child1.getImage().data[((xx+xDest) + (yy+yDest) * IMAGE_SIZE) * 4 + 2] = this.child2.getImage().data[((xx+xSource) + (yy+ySource) * IMAGE_SIZE) * 4 + 2]
+                this.child1.getImage().data[((xx+xDest) + (yy+yDest) * IMAGE_SIZE) * 4 + 0] = this.child2.getImage().data[((xx+xSource) + (yy+ySource) * IMAGE_SIZE) * 4 + 0]
 			}
 		}
 		return [this.child1,this.child2]
@@ -132,15 +127,13 @@ class Img {
 
 class GeneticAlgorithm {
 
-    constructor(populationSize, fitnessFunction, targetImage, sourceImage, attemptImage, mutationRate, crossoverRate) {
+    constructor(populationSize, fitnessFunction, targetImage, sourceImage, attemptImage, mutationRate) {
 		this.populationSize = populationSize;
 		this.fitnessFunction = fitnessFunction;
 		this.targetImage = targetImage;
 		this.population = new Population(attemptImage);
         this.sourceImage = sourceImage;
 		this.mutationRate = mutationRate;
-		this.crossoverRate = crossoverRate;
-        console.log(crossoverRate);
         this.numberOfParents = NUMBER_OF_PARENTS;
         this.numberOfChildren = this.populationSize/this.numberOfParents;
         this.iteration = 0;
@@ -168,17 +161,25 @@ class GeneticAlgorithm {
 					let child = new Individual(populationCount,copyAttemptImage,parents[i].getFitness());
 					children.push([populationCount, child]);
 				}
-				for(let j = 0; j < this.numberOfParents; j += 2) {
-					let parent1 = parents[j];
-					let parent2 = parents[j+1];
-					let [child1,child2] = this.crossover(parent1,parent2);
-					populationCount++;
-					child1 = new Individual(populationCount,child1.getImage(),child1.getFitness());
-					children.push([populationCount,child1]);
-					populationCount++;
-					child2 = new Individual(populationCount,child2.getImage(),child2.getFitness());
-					children.push([populationCount,child2]);
-				}
+            }
+            console.log(children.length);
+            console.log(this.populationSize)
+            let nChildren = children.length;
+			for(let j = 0; j < this.populationSize - nChildren; j += 2) {
+                let firstParentIdx = randomRange(0, parents.length);
+                let secondParentIdx = randomRange(0, parents.length);
+                while (secondParentIdx == firstParentIdx) {
+                    secondParentIdx = randomRange(0, parents.length);
+                }
+                let parent1 = parents[firstParentIdx];
+                let parent2 = parents[secondParentIdx];
+                let [child1,child2] = this.crossover(parent1,parent2);
+                populationCount++;
+                child1.setId(populationCount);
+                children.push([populationCount,child1]);
+                populationCount++;
+                child2.setId(populationCount);
+                children.push([populationCount,child2]);
 			}
 			this.population.setPopulation(children);
             console.log(children.length);
@@ -249,7 +250,7 @@ class GeneticAlgorithm {
             let gladiators = [];
             let gladiatorIDXs = [];
 		    for (var j = 0; j < TOURNAMENT_SIZE; j++) {
-                let randomNumber = randomRange(0, (this.populationSize - ELITE - 1));
+                let randomNumber = randomRange(0, (this.populationSize - ELITE));
                 gladiators.push(individuals[randomNumber].getFitness());
                 gladiatorIDXs.push(randomNumber);
             }
@@ -393,6 +394,9 @@ class Individual{
 		this.image = img;
 	}
 	
+    copy() {
+        return new Individual(this.id, this.image.copy(), this.fitness);
+    }
 }
 
 function distance(img1, img2) {
@@ -455,11 +459,8 @@ arjen.src = 'arjen.png';
 
 
 function main() {
-    // mutation = new SubRegionMutation(10, 20, sourceImage);
-    // for (let i = 0; i < 1000; i++) {        
-    //     mutation.mutate(attemptImage);
-    //     attemptImage.show();
-    // }
+    mutation = new SubRegionCrossover(new Individual(0, sourceImage, 1), new Individual(3, destImage, 2));
+    [window.child1, window.child2] = mutation.crossover();
 }
 
 function showPlot() {
@@ -489,7 +490,7 @@ fitnesses = new Float32Array(1000000);
 function startAlgorithm() {
     let iterationNumber = document.getElementById('iteration-number');
     let allTimeBest = document.getElementById('all-time-best');
-	ga = new GeneticAlgorithm(100,fitness,destImage,sourceImage,attemptImage,0.8,0.2);
+	ga = new GeneticAlgorithm(100,fitness,destImage,sourceImage,attemptImage,0.8);
     let runAlgorithm = () => {
         ga.doIteration();
         iterationNumber.innerHTML = ga.iteration;
