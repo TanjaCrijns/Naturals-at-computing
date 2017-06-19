@@ -1,3 +1,24 @@
+images = [
+    'Elena',
+    'Arjen',
+    'Monalisa',
+    'Trump',
+];
+
+let sourceImageSelector = document.getElementById('source-image-selection');
+let targetImageSelector = document.getElementById('target-image-selection');
+
+for (image of images) {
+    let soption = document.createElement('option');
+    soption.value = image.toLowerCase() + '.png';
+    soption.text = image;
+    let toption = document.createElement('option');
+    toption.value = image.toLowerCase() + '.png';
+    toption.text = image;
+    sourceImageSelector.appendChild(soption);
+    targetImageSelector.appendChild(toption);
+}
+
 function randomRange(min,max) {
     return Math.floor(Math.random() * (max-min+1) + min);
 }
@@ -34,7 +55,6 @@ class Img {
 
     constructor(ctx, width, height, imageData) {
         this.imageData = imageData;
-        console.log(this.imageData);
         this.data = imageData.data;
         this.width = width;
         this.height = height;
