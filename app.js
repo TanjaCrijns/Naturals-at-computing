@@ -78,14 +78,12 @@ class GeneticAlgorithm {
     constructor(populationSize, fitnessFunction, targetImage, sourceImage, attemptImage) {
 		this.populationSize = populationSize;
 		this.fitnessFunction = fitnessFunction;
-		this.crossoverRate = crossoverRate;
-		this.mutationRate = mutationRate;
 		this.targetImage = targetImage;
 		this.population = new Population(attemptImage);
     }
 
     run() {
-		initializePop();
+		this.initializePop();
 		this.population.evaluatePop();
 		
 		numberOfParents = 20;
@@ -93,7 +91,7 @@ class GeneticAlgorithm {
 		populationCount = 0;
 		while (this.population.getPopulationMax < 0.99){
 			parents = rouletteSelection(numberOfParents);
-			childern = [];
+			children = [];
 			for(var i = 1; i <= parents.length; i++) {
 				for(var j = 1; j <=numberOfChildren; j++){
 					populationCount = populationCount++;
@@ -109,8 +107,8 @@ class GeneticAlgorithm {
 			bestSolution.img.show();
 			populationCount = 0;
 		}
-		evaluatePop();
-		bestSolution = getBestSolution();
+		this.evaluatePop();
+		bestSolution = this.getBestSolution();
 		bestSolution.img.show()
     }
 	
