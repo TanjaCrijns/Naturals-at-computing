@@ -5,13 +5,6 @@ images = [
     'Trump',
 ];
 
-function fill(imageData) {
-    for (let i = 0; i < imageData.data.length; i+= 4) {
-        imageData.data[i] = 255;
-        imageData.data[i+3] = 255;
-    }
-}
-
 let sourceImageSelector = document.getElementById('source-image-selection');
 let targetImageSelector = document.getElementById('target-image-selection');
 
@@ -74,8 +67,11 @@ class Img {
 
     copy() {
         let imageData = this.ctx.createImageData(this.width, this.height)
-        for (let i = 0; i < this.imageData.data.length; i++) {
+        for (let i = 0; i < this.imageData.data.length; i+=4) {
             imageData.data[i] = this.imageData.data[i];
+            imageData.data[i+1] = this.imageData.data[i+1];
+            imageData.data[i+2] = this.imageData.data[i+2];
+            imageData.data[i+3] = 255
         }
         let newImage = new Img(this.ctx, this.width, this.height, imageData);
         return newImage;
@@ -107,7 +103,7 @@ class GeneticAlgorithm {
 
     doIteration() {
             console.log('Iteration' + ++this.iteration);
-			let parents = this.rouletteSelection(this.numberOfParents);
+			let parents = this.eliteSelection(this.numberOfParents);
 			let children = [];
             let populationCount = 0;
 
@@ -176,8 +172,8 @@ class GeneticAlgorithm {
     }
 
     eliteSelection(numberOfParents) {
-        let individuals = population.getSortedIndividuals();
-        return individuals.slice(0,numberOfParents);
+        let individuals = this.population.getSortedIndividuals();
+        return individuals.slice(0,this.numberOfParents);
     }
 
     tournamentSelection(numberOfParents, tournamentSize) {
@@ -335,14 +331,16 @@ class Individual{
 
 function distance(img1, img2) {
     let distance = 0;
-    for (i = 0; i < img1.data.length; i++) {
+    for (let i = 0, len=img1.data.length; i < len; i+=4) {
         distance += Math.abs(img1.data[i] - img2.data[i]);
+        distance += Math.abs(img1.data[i+1] - img2.data[i+1]);
+        distance += Math.abs(img1.data[i+1] - img2.data[i+2]);
     }
     return distance;
 }
 
 function fitness(img1, img2) {
-    let fitness = 1 - distance(img1,img2)/(255*4*img1.height*img1.width);
+    let fitness = 1 - distance(img1,img2)/(255*3*img1.height*img1.width);
     return fitness;
 }
 
@@ -398,13 +396,14 @@ function main() {
     // }
 }
 
-
-
 function startAlgorithm() {
+    let iterationNumber = document.getElementById('iteration-number');
+    let allTimeBest = document.getElementById('all-time-best');
 	ga = new GeneticAlgorithm(100,fitness,destImage,sourceImage,attemptImage);
     let runAlgorithm = () => {
         ga.doIteration();
-
+        iterationNumber.innerHTML = ga.iteration;
+        allTimeBest.innerHTML = ga.getBestSolution().fitness;
         window.requestAnimationFrame(runAlgorithm);
     }
     runAlgorithm();
