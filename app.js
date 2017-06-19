@@ -55,7 +55,7 @@ class Img {
 
 class GeneticAlgorithm {
 
-    constructor(populationSize, fitnessFunction, crossoverRate, mutationRate, targetImage, sourceImage, attemptImage) { // en nog wat meer parameters
+    constructor(populationSize, fitnessFunction, targetImage, sourceImage, attemptImage) { // en nog wat meer parameters
 		this.populationSize = populationSize;
 		this.fitnessFunction = fitnessFunction;
 		this.crossoverRate = crossoverRate;
@@ -64,21 +64,39 @@ class GeneticAlgorithm {
 		this.population = new Population(attemptImage);
     }
 
-    run(stopping_criterion) {
-        // draai algorithme
+    run() {
+		numberOfParents = 20;
+		numberOfChildren = this.populationSize/numberOfParents;
+		populationCount = 0;
 		while (this.population.getPopulationMax > 0.99){
-			// parents <- selectparents(population)
-			//childern <- []
-			//for(parent1,parent2 <- parents)
-				//child1, child2 <- crossover(parent1, parent2, crossoverRate)
-				//children <- mutate(child1,mutationRate)
-				//children <- mutate(child2, mutationRate)
+			parents = rouletteSelection(numberOfParents);
+			childern = [];
+			for(var i = 1; i <= parents.length; i++) {
+				for(var j = 1; j <=numberOfChildren; j++){
+					populationCount = populationCount++;
+					copyAttemptImage = parents[i].getImage();
+					mutate(copyAttemptImage);
+					child = new Individual(populationCount,copyAttemptImage,parents[i].getFitness());
+					children.append(child);
+				}
+			}
+			this.population.setPopulation(children);
+			this.population.evaluatePop();
+			bestSolution = getBestSolution();
+			bestSolution.img.show();
+			populationCount = 0;
 		}
 		evaluatePop();
 		bestSolution = getBestSolution();
-		//this.population = replace(this.population,children);
     }
 	
+
+	mutate(copyAttemptImage) {
+		subRegionMutator = new subRegionMutation(10, 20, this.sourceImage);
+		subRegionMutator.mutate(copyAttemptImage)
+	}
+	
+
     rouletteSelection(numberOfParents) {
         let totalFitness = 0;
         let proportionList = [];
@@ -173,12 +191,13 @@ class Population {
 	
 	constructor(attemptImage) {
 		this.individuals = [];
-		this.max = {img: attemptImage, fitness: 0};
+		this.copyImage = attemptImage.copy();
+		this.max = {img: this.copyImage, fitness: 0};
 	}
 	
 	initializePop(populationSize) {
 		for (var i = 1; i <= this.populationSize; i++) {
-			var individual = new Individual(i);
+			var individual = new Individual(i,this.copyImage,0);
 			entry = [i,individual]
 			this.individuals.push(entry);
 		}
@@ -232,14 +251,19 @@ class Population {
 
 class Individual{
 	
-	constructor(id) {
+	constructor(id, copyAttemptImage, fitness) {
 		this.id = id;
-		this.image = new Image();
-		this.fitness = 0;
+		this.image = copyAttemptImage;
+		this.fitness = fitness;
 	}
+	
 	
 	getId() {
 		return this.id;
+	}
+	
+	setId(id) {
+		this.id = id;
 	}
 	
 	setFitness(newFitness) {
@@ -277,8 +301,8 @@ let srcCanvas = document.getElementById('sourceImage');
 let attemptCanvas = document.getElementById('attempt')
 let destCanvas = document.getElementById('destImage');
 
-let width = 400;
-let height = 400;
+let width = 300;
+let height = 300;
 
 // meuk code om de plaatjes in te laden, roept main aan als het klaar is
 let arjen = new Image();
@@ -318,8 +342,8 @@ arjen.src = 'arjen.png';
 
 
 function main() {
-    mutation = new SubRegionMutation(50, 100, sourceImage);
-    for (let i = 0; i < 100; i++) {        
+    mutation = new SubRegionMutation(10, 20, sourceImage);
+    for (let i = 0; i < 1000; i++) {        
         mutation.mutate(attemptImage);
         attemptImage.show();
     }
