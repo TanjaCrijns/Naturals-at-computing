@@ -9,6 +9,8 @@ let MIN_PATCH_SIZE = 5;
 let MAX_PATCH_SIZE = 25;
 let IMAGE_SIZE = 200
 let NUMBER_OF_PARENTS = 5;
+let ELITE = Math.floor(NUMBER_OF_PARENTS/2);
+let TOURNAMENT_SIZE = 10;
 
 function createData() {
     window.chart = new google.visualization.LineChart(document.getElementById('chart'));
@@ -34,6 +36,42 @@ for (image of images) {
 
 function randomRange(min,max) {
     return Math.floor(Math.random() * (max-min) + min);
+}
+
+class subRegionCrossover{
+	
+	constructor(parent1,parent2){
+		this.child1 = parent1;
+		this.child2 = parent2;
+		this.width = p1_image.width;
+		this.height = p1_image.height;
+		this.source_data1 = p1_image.data;
+		this.dest_data2 = p2_image.data;
+		this.source_data2 = p2_image.data;
+		this.dest_data1 = p1_image.data;
+	}
+	
+	crossover() {
+		let patchWidth = this.width/2;
+		let patchHeight = this.height;
+		let xSource = 0;
+        let ySource = 0;
+        let xDest = 0;
+		let yDest = 0;
+		
+		for(let yy = 0; yy < patchHeight; yy++) {
+			for (let xx = 0; xx < patchWidth; xx++) {
+				this.child2.getImage().data[((xx+xDest) + (yy+yDest) * image.width) * 4 + 1] = this.child1.getImage().data[((xx+xSource) + (yy+ySource) * image.width) * 4 + 1]
+                this.child2.getImage().data[((xx+xDest) + (yy+yDest) * image.width) * 4 + 2] = this.child1.getImage().data[((xx+xSource) + (yy+ySource) * image.width) * 4 + 2]
+                this.child2.getImage().data[((xx+xDest) + (yy+yDest) * image.width) * 4 + 0] = this.child1.getImage().data[((xx+xSource) + (yy+ySource) * image.width) * 4 + 0]
+				
+				this.child1.getImage().data[((xx+xDest) + (yy+yDest) * image.width) * 4 + 1] = this.child2.getImage().data[((xx+xSource) + (yy+ySource) * image.width) * 4 + 1]
+                this.child1.getImage().data[((xx+xDest) + (yy+yDest) * image.width) * 4 + 2] = this.child2.getImage().data[((xx+xSource) + (yy+ySource) * image.width) * 4 + 2]
+                this.child1.getImage().data[((xx+xDest) + (yy+yDest) * image.width) * 4 + 0] = this.child2.getImage().data[((xx+xSource) + (yy+ySource) * image.width) * 4 + 0]
+			}
+		}
+		return [this.child1,this.child2]
+	}
 }
 
 class SubRegionMutation {
@@ -94,16 +132,17 @@ class Img {
 
 class GeneticAlgorithm {
 
-    constructor(populationSize, fitnessFunction, targetImage, sourceImage, attemptImage) {
+    constructor(populationSize, fitnessFunction, targetImage, sourceImage, attemptImage, mutationRate, crossoverRate) {
 		this.populationSize = populationSize;
 		this.fitnessFunction = fitnessFunction;
 		this.targetImage = targetImage;
 		this.population = new Population(attemptImage);
         this.sourceImage = sourceImage;
+		this.mutationRate = mutationRate;
+		this.crossoverRate = crossoverRate;
         this.numberOfParents = NUMBER_OF_PARENTS;
         this.numberOfChildren = this.populationSize/this.numberOfParents;
         this.iteration = 0;
-        
 		this.initializePop();
 		this.evaluatePop();
     }
@@ -116,17 +155,28 @@ class GeneticAlgorithm {
 
     doIteration() {
             console.log('Iteration' + ++this.iteration);
-			let parents = this.eliteSelection(this.numberOfParents);
+			let parents = this.tournamentSelection();
 			let children = [];
             let populationCount = 0;
-
+			let numberOfMutationChildren = (this.populationSize*this.mutationRate)/this.numberOfParents;
 			for(let i = 0; i < parents.length; i++) {
-				for(let j = 0; j < this.numberOfChildren; j++){
+				for(let j = 0; j < numberOfMutationChildren; j++){
 					populationCount++;
 					let copyAttemptImage = parents[i].getImage().copy();
 					this.mutate(copyAttemptImage);
 					let child = new Individual(populationCount,copyAttemptImage,parents[i].getFitness());
-					children.push([j, child]);
+					children.push([populationCount, child]);
+				}
+				for(let j = 0; j < numberOfParents; j = j + 2) {
+					parent1 = parents[j];
+					parent2 = parents[j+1];
+					[child1,child2] = this.crossover(parent1,parent2);
+					populationCount++;
+					child1 = new Individual(populationCount,child1.getImage(),child1.getFitness());
+					children.push([populationCount,child1]);
+					populationCount++;
+					child2 = new Individual(populationCount,child2.getImage(),child2.getFitness());
+					children.push([populationCount,child2]);
 				}
 			}
 			this.population.setPopulation(children);
@@ -137,6 +187,11 @@ class GeneticAlgorithm {
             console.log(bestSolution.fitness);
     }
 	
+	crossover(parent1,parent2) {
+		let crossoverComputer = new subRegionCrossover(parent1,parent2);
+		[child1,child2] = crossoverComputer.crossover();
+		return [child1,child2];
+	}
 
 	mutate(copyAttemptImage) {
 		let subRegionMutator = new SubRegionMutation(MIN_PATCH_SIZE, MAX_PATCH_SIZE, this.sourceImage);
@@ -144,11 +199,11 @@ class GeneticAlgorithm {
 	}
 	
 
-    rouletteSelection(numberOfParents) {
+    rouletteSelection() {
         let totalFitness = 0;
         let proportionList = [];
         let individuals = this.population.getSortedIndividuals();
-        let parents = [];
+        let parents = individuals.splice(0, ELITE);
 
         for (let i = 0; i < individuals.length; i++) {
             totalFitness += individuals[i].getFitness();   
@@ -157,7 +212,7 @@ class GeneticAlgorithm {
             proportionList.push(individuals[i].getFitness() / totalFitness);
         }
         
-        for (let i = 0; i < numberOfParents; i++) {
+        for (let i = 0; i < (this.numberOfParents - ELITE); i++) {
             let idx = this.selectByProportion(proportionList);
             parents.push(individuals[idx]);
             individuals.splice(idx, 1);
@@ -185,19 +240,15 @@ class GeneticAlgorithm {
         return choice;
     }
 
-    eliteSelection(numberOfParents) {
+    tournamentSelection() {
         let individuals = this.population.getSortedIndividuals();
-        return individuals.slice(0,this.numberOfParents);
-    }
+        let parents = individuals.splice(0, ELITE);
 
-    tournamentSelection(numberOfParents, tournamentSize) {
-        let individuals = population.getSortedIndividuals();
-        let parents = [];
-		for (var i = 0; i < numberOfParents; i++) {
+		for (var i = 0; i < (this.numberOfParents - ELITE); i++) {
             let gladiators = [];
             let gladiatorIDXs = [];
-		    for (var j = 0; j < tournamentSize; j++) {
-                let randomNumber = randomRange(0, population.populationSize);
+		    for (var j = 0; j < TOURNAMENT_SIZE; j++) {
+                let randomNumber = randomRange(0, (this.populationSize - ELITE - 1));
                 gladiators.push(individuals[randomNumber].getFitness());
                 gladiatorIDXs.push(randomNumber);
             }
