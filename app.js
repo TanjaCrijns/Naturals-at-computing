@@ -156,6 +156,7 @@ class GeneticAlgorithm {
                     max = gladiators[k];
                     maxIDX = gladiatorIDXs[k];
                 }
+            }
             parents.push(individuals[maxIDX]);
         }
         return parents
