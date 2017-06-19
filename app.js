@@ -30,6 +30,42 @@ function randomRange(min,max) {
     return Math.floor(Math.random() * (max-min+1) + min);
 }
 
+class subRegionCrossover{
+	
+	constructor(parent1,parent2){
+		this.child1 = parent1;
+		this.child2 = parent2;
+		this.width = p1_image.width;
+		this.height = p1_image.height;
+		this.source_data1 = p1_image.data;
+		this.dest_data2 = p2_image.data;
+		this.source_data2 = p2_image.data;
+		this.dest_data1 = p1_image.data;
+	}
+	
+	crossover() {
+		let patchWidth = this.width/2;
+		let patchHeight = this.height;
+		let xSource = 0;
+        let ySource = 0;
+        let xDest = 0;
+		let yDest = 0;
+		
+		for(let yy = 0; yy < patchHeight; yy++) {
+			for (let xx = 0; xx < patchWidth; xx++) {
+				this.child2.getImage().data[((xx+xDest) + (yy+yDest) * image.width) * 4 + 1] = this.child1.getImage().data[((xx+xSource) + (yy+ySource) * image.width) * 4 + 1]
+                this.child2.getImage().data[((xx+xDest) + (yy+yDest) * image.width) * 4 + 2] = this.child1.getImage().data[((xx+xSource) + (yy+ySource) * image.width) * 4 + 2]
+                this.child2.getImage().data[((xx+xDest) + (yy+yDest) * image.width) * 4 + 0] = this.child1.getImage().data[((xx+xSource) + (yy+ySource) * image.width) * 4 + 0]
+				
+				this.child1.getImage().data[((xx+xDest) + (yy+yDest) * image.width) * 4 + 1] = this.child2.getImage().data[((xx+xSource) + (yy+ySource) * image.width) * 4 + 1]
+                this.child1.getImage().data[((xx+xDest) + (yy+yDest) * image.width) * 4 + 2] = this.child2.getImage().data[((xx+xSource) + (yy+ySource) * image.width) * 4 + 2]
+                this.child1.getImage().data[((xx+xDest) + (yy+yDest) * image.width) * 4 + 0] = this.child2.getImage().data[((xx+xSource) + (yy+ySource) * image.width) * 4 + 0]
+			}
+		}
+		return [this.child1,this.child2]
+	}
+}
+
 class SubRegionMutation {
     constructor(minSize, maxSize, sourceImage) {
         this.minSize = minSize;
@@ -85,12 +121,14 @@ class Img {
 
 class GeneticAlgorithm {
 
-    constructor(populationSize, fitnessFunction, targetImage, sourceImage, attemptImage) {
+    constructor(populationSize, fitnessFunction, targetImage, sourceImage, attemptImage, mutationRate, crossoverRate) {
 		this.populationSize = populationSize;
 		this.fitnessFunction = fitnessFunction;
 		this.targetImage = targetImage;
 		this.population = new Population(attemptImage);
         this.sourceImage = sourceImage;
+		this.mutationRate = mutationRate;
+		this.crossoverRate = crossoverRate;
     }
 
     run() {
@@ -100,7 +138,7 @@ class GeneticAlgorithm {
 		this.evaluatePop();
 		
 		let numberOfParents = 20;
-		let numberOfChildren = this.populationSize/numberOfParents;
+		let numberOfMutationChildren = (this.populationSize*this.mutationRate)/numberOfParents;
 		let populationCount = 0;
         let iteration = 0;
 		while (this.population.getPopulationMax().fitness < 0.99){
@@ -109,12 +147,23 @@ class GeneticAlgorithm {
 			let children = [];
             console.log(parents);
 			for(let i = 0; i < parents.length; i++) {
-				for(let j = 0; j < numberOfChildren; j++){
+				for(let j = 0; j < numberOfMutationChildren; j++){
 					populationCount++;
 					let copyAttemptImage = parents[i].getImage();
 					this.mutate(copyAttemptImage);
 					let child = new Individual(populationCount,copyAttemptImage,parents[i].getFitness());
 					children.push(child);
+				}
+				for(let j = 0; j < numberOfParents; j = j + 2) {
+					parent1 = parents[j];
+					parent2 = parents[j+1];
+					[child1,child2] = this.crossover(parent1,parent2);
+					populationCount++;
+					child1 = new Individual(populationCount,child1.getImage(),child1.getFitness());
+					populationCount++;
+					child2 = new Individual(populationCount,child2.getImage(),child2.getFitness());
+					children.push(child1);
+					children.push(child2);
 				}
 			}
 			this.population.setPopulation(children);
@@ -129,10 +178,15 @@ class GeneticAlgorithm {
 		bestSolution.img.show()
     }
 	
+	crossover(parent1,parent2) {
+		let crossoverComputer = new subRegionCrossover(parent1,parent2);
+		[child1,child2] = crossoverComputer.crossover();
+		return [child1,child2];
+	}
 
 	mutate(copyAttemptImage) {
 		let subRegionMutator = new SubRegionMutation(10, 20, this.sourceImage);
-		subRegionMutator.mutate(copyAttemptImage)
+		subRegionMutator.mutate(copyAttemptImage);
 	}
 	
 
