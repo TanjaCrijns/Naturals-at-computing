@@ -89,13 +89,13 @@ class GeneticAlgorithm {
 		//this.population = replace(this.population,children);
     }
 	
-<<<<<<< HEAD
+
 	mutate(attemptImage) {
 		subRegionMutator = new subRegionMutation(minSize, maxSize, this.sourceImage);
 		subRegionMutator.mutate(attemptImage)
 	}
 	
-=======
+
     rouletteSelection(numberOfParents) {
         let totalFitness = 0;
         let proportionList = [];
@@ -140,7 +140,7 @@ class GeneticAlgorithm {
 
 
 
->>>>>>> 43ffc3f947ef391fd8e3956dc2f81634ada535bb
+
 	initializePop() {
 		// initaliseer populatie
 		this.population.initializePop(this.populationSize);
