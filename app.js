@@ -91,42 +91,40 @@ class GeneticAlgorithm {
 		this.targetImage = targetImage;
 		this.population = new Population(attemptImage);
         this.sourceImage = sourceImage;
+        this.numberOfParents = 20;
+        this.numberOfChildren = this.populationSize/this.numberOfParents;
+        this.iteration = 0;
+        
+		this.initializePop();
+		this.evaluatePop();
     }
 
     run() {
-        console.log('Initializing population..');
-		this.initializePop();
-        console.log('Evaluating population..');
 		this.evaluatePop();
-		
-		let numberOfParents = 20;
-		let numberOfChildren = this.populationSize/numberOfParents;
-		let populationCount = 0;
-        let iteration = 0;
-		while (this.population.getPopulationMax().fitness < 0.99){
-            console.log('Iteration' + ++iteration);
-			let parents = this.rouletteSelection(numberOfParents);
+		let bestSolution = this.getBestSolution();
+		bestSolution.img.show()
+    }
+
+    doIteration() {
+            console.log('Iteration' + ++this.iteration);
+			let parents = this.rouletteSelection(this.numberOfParents);
 			let children = [];
-            console.log(parents);
+            let populationCount = 0;
+
 			for(let i = 0; i < parents.length; i++) {
-				for(let j = 0; j < numberOfChildren; j++){
+				for(let j = 0; j < this.numberOfChildren; j++){
 					populationCount++;
-					let copyAttemptImage = parents[i].getImage();
+					let copyAttemptImage = parents[i].getImage().copy();
 					this.mutate(copyAttemptImage);
 					let child = new Individual(populationCount,copyAttemptImage,parents[i].getFitness());
-					children.push(child);
+					children.push([j, child]);
 				}
 			}
 			this.population.setPopulation(children);
 			this.evaluatePop();
 			let bestSolution = this.getBestSolution();
 			bestSolution.img.show();
-			populationCount = 0;
             console.log(bestSolution.fitness);
-		}
-		this.evaluatePop();
-		let bestSolution = this.getBestSolution();
-		bestSolution.img.show()
     }
 	
 
@@ -149,7 +147,6 @@ class GeneticAlgorithm {
             proportionList.push(individuals[i].getFitness() / totalFitness);
         }
         
-        console.log(proportionList);
         for (let i = 0; i < numberOfParents; i++) {
             let idx = this.selectByProportion(proportionList);
             parents.push(individuals[idx]);
@@ -212,21 +209,17 @@ class GeneticAlgorithm {
 		this.population.initializePop(this.populationSize);
 		let individuals = this.population.getPopulation();
 		for(var i = 0; i < individuals.length; i++) {
-			let copyAttemptImage = individuals[i][1].getImage().copy();
+			let copyAttemptImage = individuals[i][1].getImage();
 			this.mutate(copyAttemptImage);
+
 		}
 	}
 	
 	evaluatePop() {
 		// evalueer populatie
 		let individuals = this.population.getPopulation();
-        console.log(individuals);
 		for (var i = 0; i < individuals.length; i++) {
-			let individual = individuals[i];
-            if( Object.prototype.toString.call(individual) === '[object Array]' ) {
-                individual = individual[1];
-            }
-            console.log(individual);
+			let individual = individuals[i][1];
 			let individualImage = individual.getImage();
 			let individualFitness = this.fitnessFunction(this.targetImage,individualImage);
 			individual.setFitness(individualFitness);
@@ -247,13 +240,13 @@ class Population {
 	
 	constructor(attemptImage) {
 		this.individuals = [];
-		this.copyImage = attemptImage.copy();
-		this.max = {img: this.copyImage, fitness: 0};
+		this.attempt = attemptImage;
+		this.max = {img: this.attempt, fitness: 0};
 	}
 	
 	initializePop(populationSize) {
 		for (var i = 1; i <= populationSize; i++) {
-			var individual = new Individual(i,this.copyImage,0);
+			var individual = new Individual(i,this.attempt.copy(),0);
 			let entry = [i,individual]
 			this.individuals.push(entry);
 		}
@@ -405,7 +398,14 @@ function main() {
     // }
 }
 
+
+
 function startAlgorithm() {
 	ga = new GeneticAlgorithm(100,fitness,destImage,sourceImage,attemptImage);
-	ga.run()
+    let runAlgorithm = () => {
+        ga.doIteration();
+
+        window.requestAnimationFrame(runAlgorithm);
+    }
+    runAlgorithm();
 }
