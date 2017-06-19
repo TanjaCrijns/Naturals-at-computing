@@ -519,7 +519,9 @@ function startAlgorithm() {
     let allTimeBest = document.getElementById('all-time-best');
     let algoElement = document.getElementById('selection-algorithm');
     let selectionAlgo = algoElement.options[algoElement.selectedIndex].value;
-	ga = new GeneticAlgorithm(100,fitness,destImage,sourceImage,attemptImage,0.8, selectionAlgo);
+    let populationSize = document.getElementById('population-size').value;
+    let mutationRate = document.getElementById('mutation-rate').value;
+	ga = new GeneticAlgorithm(populationSize,fitness,destImage,sourceImage,attemptImage,mutationRate, selectionAlgo);
     let runAlgorithm = () => {
         ga.doIteration();
         iterationNumber.innerHTML = ga.iteration;
