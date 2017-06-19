@@ -53,18 +53,18 @@ class Img {
 
 class GeneticAlgorithm {
 
-    constructor(populationSize, fitnessFunction, crossoverRate, mutationRate, targetImage) { // en nog wat meer parameters
+    constructor(populationSize, fitnessFunction, crossoverRate, mutationRate, targetImage, sourceImage, attemptImage) { // en nog wat meer parameters
 		this.populationSize = populationSize;
 		this.fitnessFunction = fitnessFunction;
 		this.crossoverRate = crossoverRate;
 		this.mutationRate = mutationRate;
 		this.targetImage = targetImage;
-		this.population = new Population();
+		this.population = new Population(attemptImage);
     }
 
     run(stopping_criterion) {
         // draai algorithme
-		while (!stopping_criterion){
+		while (this.population.getPopulationMax > 0.99){
 			// parents <- selectparents(population)
 			//childern <- []
 			//for(parent1,parent2 <- parents)
@@ -88,7 +88,7 @@ class GeneticAlgorithm {
 		for (var i = 0; j < individuals.length; i++) {
 			individual = individuals[i];
 			individualImage = individual.getImage();
-			individualFitness = fitness(this.targetImage,individualImage);
+			individualFitness = fitnessFunction(this.targetImage,individualImage);
 			individual.setFitness(individualFitness);
 			if (individualFitness > this.population.max.fitness) {
 				this.population.setPopulationMax(individualFitness,individualImage);
@@ -105,15 +105,16 @@ class GeneticAlgorithm {
 
 class Population {
 	
-	constructor() {
+	constructor(attemptImage) {
 		this.individuals = [];
-		this.max = {img: "image_object", fitness: 0};
+		this.max = {img: attemptImage, fitness: 0};
 	}
 	
 	initializePop(populationSize) {
 		for (var i = 1; i <= this.populationSize; i++) {
-			var individual = new Individual();
-			this.individuals.push(individual);
+			var individual = new Individual(i);
+			entry = [i,individual]
+			this.individuals.push(entry);
 		}
 	}
 	
@@ -134,13 +135,45 @@ class Population {
 		return this.max;
 	}
 	
+	sortFitnessScores(){
+		scores = [];
+		for (var i = 1; i <= this.individuals.length; i++) {
+			score = this.individuals[i].getFitness();
+			id = this.individuals[i].getId();
+			entry = [id,score];
+			scores.push(entry)
+		}
+		scores = scores.sort(function(a,b){return a[1]>b[1];});
+		return scores;
+	}
+	
+	getSortedIndividuals() {
+		sortedIndividuals = [];
+		sortedScores = sortFitnessScores();
+		for(var i = 1; i <= sortedScores.length; i++) {
+			[id,score] = sortedScores[i];
+			for(var j = 1; j <= this.individuals.length; j++) {
+				[individual_id,individual] = this.individuals[j];
+				if (id == individual_id) {
+					sortedIndividuals.push(individual);
+				}
+			}
+		}
+		return sortedIndividuals;
+	}
+	
 }
 
 class Individual{
 	
-	constructor() {
+	constructor(id) {
+		this.id = id;
 		this.image = new Image();
 		this.fitness = 0;
+	}
+	
+	getId() {
+		return this.id;
 	}
 	
 	setFitness(newFitness) {
@@ -153,6 +186,10 @@ class Individual{
 	
 	getImage() {
 		return this.image;
+	}
+	
+	setImage(img) {
+		this.image = img;
 	}
 	
 }
