@@ -160,7 +160,6 @@ class Individual{
 }
 
 function distance(img1, img2) {
-    // bereken sum((img1 - img2)^2)
     let distance = 0;
     for (i = 0; i < img1.data.length; i++) {
         distance += Math.abs(img1.data[i] - img2.data[i]);
@@ -177,8 +176,8 @@ let srcCanvas = document.getElementById('sourceImage');
 let attemptCanvas = document.getElementById('attempt')
 let destCanvas = document.getElementById('destImage');
 
-let width = 400;
-let height = 400;
+let width = 300;
+let height = 300;
 
 // meuk code om de plaatjes in te laden, roept main aan als het klaar is
 let arjen = new Image();
@@ -218,8 +217,8 @@ arjen.src = 'arjen.png';
 
 
 function main() {
-    mutation = new SubRegionMutation(50, 100, sourceImage);
-    for (let i = 0; i < 100; i++) {        
+    mutation = new SubRegionMutation(10, 20, sourceImage);
+    for (let i = 0; i < 1000; i++) {        
         mutation.mutate(attemptImage);
         attemptImage.show();
     }

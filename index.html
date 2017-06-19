@@ -1,12 +1,56 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <title>Natural computing: Genetic Algorithm Image Mosaics</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" type="text/css">
         <link rel="stylesheet" href="style.css" type="text/css">
     </head>
     <body>
-        <canvas id="sourceImage"></canvas>
-        <canvas id="attempt"></canvas>
-        <canvas id="destImage"></canvas>
+        <div class="container">
+            <h1>Generating Image Mosaics using a Genetic Algorithm</h1>
+            <div class="row">
+                <div class="one-third column">
+                    <h4>Source image</h4>
+                </div>
+                <div class="one-third column">
+                    <h4>Current attempt</h4>
+                </div>
+                <div class="one-third column">
+                    <h4>Target image</h4>
+                </div>
+            </div>
+            <div class="row">
+                <div class="one-third column">
+                    <canvas id="sourceImage"></canvas>
+                </div>
+                <div class="one-third column">
+                    <canvas id="attempt"></canvas>
+                </div>
+                <div class="one-third column">
+                    <canvas id="destImage"></canvas>
+                </div>
+            </div>
+            <div class="row">
+                    <div class="one-third column button-wrapper">
+                        <select class="" id="source-image-selection">
+                            <option value="Option 1">Questions</option>
+                            <option value="Option 2">Admiration</option>
+                            <option value="Option 3">Can I get your number?</option>
+                        </select>
+                    </div>
+                <div class="one-third column button-wrapper">
+                    <input type="button" value="Start" class="button-primary">
+                </div>
+                <div class="one-third column button-wrapper">
+                        <select class="" id="source-image-selection">
+                            <option value="Option 1">Questions</option>
+                            <option value="Option 2">Admiration</option>
+                            <option value="Option 3">Can I get your number?</option>
+                        </select>
+                </div>
+            </div>
+        </div>
+        
         <script src="app.js"></script>
     </body>
 </html>
