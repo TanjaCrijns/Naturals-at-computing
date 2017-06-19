@@ -55,7 +55,7 @@ class Img {
 
 class GeneticAlgorithm {
 
-    constructor(populationSize, fitnessFunction, targetImage, sourceImage, attemptImage) { // en nog wat meer parameters
+    constructor(populationSize, fitnessFunction, targetImage, sourceImage, attemptImage) {
 		this.populationSize = populationSize;
 		this.fitnessFunction = fitnessFunction;
 		this.crossoverRate = crossoverRate;
@@ -65,10 +65,13 @@ class GeneticAlgorithm {
     }
 
     run() {
+		initializePop();
+		this.population.evaluatePop();
+		
 		numberOfParents = 20;
 		numberOfChildren = this.populationSize/numberOfParents;
 		populationCount = 0;
-		while (this.population.getPopulationMax > 0.99){
+		while (this.population.getPopulationMax < 0.99){
 			parents = rouletteSelection(numberOfParents);
 			childern = [];
 			for(var i = 1; i <= parents.length; i++) {
@@ -142,6 +145,11 @@ class GeneticAlgorithm {
 	initializePop() {
 		// initaliseer populatie
 		this.population.initializePop(this.populationSize);
+		individuals = this.population.getPopulation();
+		for(var i = 1; i <= individuals.length; i++) {
+			copyAttemptImage = individuals[i].getImage();
+			mutate(copyAttemptImage);
+		}
 	}
 	
 	evaluatePop() {
@@ -325,4 +333,9 @@ function main() {
         mutation.mutate(attemptImage);
         attemptImage.show();
     }
+}
+
+function startAlgorithm() {
+	ga = new GeneticAlgorithm(100,fitness,elena,arjen,attemptImage);
+	
 }
