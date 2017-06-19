@@ -1,5 +1,5 @@
 function randomRange(min,max) {
-    return Math.random() * (max-min+1) + min;
+    return Math.floor(Math.random() * (max-min+1) + min);
 }
 
 class SubRegionMutation {
@@ -12,8 +12,20 @@ class SubRegionMutation {
     }
 
     mutate(image) {
-        let width = Math.random()
-        let x1 = Math.random() * (this.width - this.maxSize) 
+        let patchWidth = randomRange(this.minSize, this.maxSize);
+        let patchHeight = randomRange(this.minSize, this.maxSize);
+        let xSource = randomRange(0, this.width - patchWidth);
+        let ySource = randomRange(0, this.height - patchHeight);
+        let xDest = randomRange(0, image.width - patchWidth);
+        let yDest = randomRange(0, image.height - patchHeight);
+
+        for (let yy = 0; yy < patchHeight; yy++) {
+            for (let xx = 0; xx < patchWidth; xx++) {
+                image.data[((xx+xDest) + (yy+yDest) * image.width) * 4 + 1] = this.sourceData[((xx+xSource) + (yy+ySource) * image.width) * 4 + 1]
+                image.data[((xx+xDest) + (yy+yDest) * image.width) * 4 + 2] = this.sourceData[((xx+xSource) + (yy+ySource) * image.width) * 4 + 2]
+                image.data[((xx+xDest) + (yy+yDest) * image.width) * 4 + 0] = this.sourceData[((xx+xSource) + (yy+ySource) * image.width) * 4 + 0]
+            }
+        }
 
     }
 }
@@ -21,13 +33,16 @@ class SubRegionMutation {
 class Img {
 
     constructor(ctx, image) {
-        this.data = ctx.getImageData(0, 0, image.width, image.height).data;
+        this.imageData = ctx.getImageData(0, 0, image.width, image.height);
+        console.log(this.imageData);
+        this.data = this.imageData.data;
         this.width = image.width;
         this.height = image.height;
+        this.ctx = ctx;
     }
 
     show() {
-        // teken op canvas dmv context: ctx.setImageData
+        this.ctx.putImageData(this.imageData, 0, 0);
     }
 
     drawRect(rect) {
@@ -38,7 +53,7 @@ class Img {
 
 class GeneticAlgorithm {
 
-    constructor(populationSize, fitnessFunction, crossoverRate, mutationRate, targetImage, sourceImage) { // en nog wat meer parameters
+    constructor(populationSize, fitnessFunction, crossoverRate, mutationRate, targetImage) { // en nog wat meer parameters
 		this.populationSize = populationSize;
 		this.fitnessFunction = fitnessFunction;
 		this.crossoverRate = crossoverRate;
@@ -47,9 +62,20 @@ class GeneticAlgorithm {
 		this.population = new Population();
     }
 
-    run() {
-		
-	}
+    run(stopping_criterion) {
+        // draai algorithme
+		while (!stopping_criterion){
+			// parents <- selectparents(population)
+			//childern <- []
+			//for(parent1,parent2 <- parents)
+				//child1, child2 <- crossover(parent1, parent2, crossoverRate)
+				//children <- mutate(child1,mutationRate)
+				//children <- mutate(child2, mutationRate)
+		}
+		evaluatePop();
+		bestSolution = getBestSolution();
+		//this.population = replace(this.population,children);
+    }
 	
 	initializePop() {
 		// initaliseer populatie
@@ -113,7 +139,7 @@ class Population {
 class Individual{
 	
 	constructor() {
-		this.img = new Img();
+		this.image = new Image();
 		this.fitness = 0;
 	}
 	
@@ -127,10 +153,6 @@ class Individual{
 	
 	getImage() {
 		return this.image;
-	}
-	
-	setImage(img) {
-		this.img = img;
 	}
 	
 }
@@ -158,6 +180,7 @@ let height = 400;
 
 // meuk code om de plaatjes in te laden, roept main aan als het klaar is
 let arjen = new Image();
+let elena = new Image();
 arjen.onload = () => {
     let ctx = srcCanvas.getContext('2d');
     srcCanvas.width = width;
@@ -171,7 +194,6 @@ arjen.onload = () => {
 
     window.sourceImage = new Img(ctx, arjen);
 
-    let elena = new Image();
     elena.onload = () => {
         let ctx = destCanvas.getContext('2d');
         destCanvas.width = width;
@@ -179,6 +201,9 @@ arjen.onload = () => {
         elena.width = width;
         elena.height = height;
         ctx.drawImage(elena, 0, 0, width, height);
+        attemptCtx = attemptCanvas.getContext('2d');
+        attemptCtx.fillRect(0, 0, width, height);
+        attemptImage = new Img(attemptCtx, attemptCanvas);
 
         window.destImage = new Img(ctx, elena);
         main();
@@ -191,7 +216,9 @@ arjen.src = 'arjen.png';
 
 
 function main() {
-    console.log(sourceImage);
-    console.log(destImage);
-    console.log(fitness(sourceImage, destImage))
+    mutation = new SubRegionMutation(50, 100, sourceImage);
+    for (let i = 0; i < 100; i++) {        
+        mutation.mutate(attemptImage);
+        attemptImage.show();
+    }
 }
