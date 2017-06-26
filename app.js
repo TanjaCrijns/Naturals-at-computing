@@ -49,7 +49,7 @@ function loadImage(e) {
         if (e == 'source') {
             sourceImage = img;
         } else {
-            targetImage = img;
+            destImage = img;
         }
     }
     image.src = imageName;
