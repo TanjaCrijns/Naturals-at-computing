@@ -272,30 +272,13 @@ class GeneticAlgorithm {
         }
         
         for (let i = 0; i < (this.numberOfParents); i++) {
-            let idx = this.selectByRank(rankList);
+            let idx = this.selectByProportion(rankList);
             parents.push(individuals[idx]);
             individuals.splice(idx, 1);
             rankList.splice(idx, 1);
         }
 
         return parents;
-    }
-
-    selectByRank(rankList) {
-        let sum = 0;
-        for (let i = 0; i < rankList.length; i++) {
-            sum += rankList[i];
-        }
-        let randomNumber = sum * Math.random();
-        let choice = -1;
-        for (let i = 0; i < rankList.length; i++) {
-            randomNumber -= rankList[i];
-            if (randomNumber <= 0) {
-                choice = i ;
-                break; 
-            }
-        }
-        return choice;
     }
 
     rouletteSelection() {
