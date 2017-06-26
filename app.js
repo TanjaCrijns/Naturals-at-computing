@@ -112,8 +112,8 @@ class SubRegionMutation {
         let patchHeight = randomRange(this.minSize, this.maxSize);
         let xSource = randomRange(0, this.width - patchWidth);
         let ySource = randomRange(0, this.height - patchHeight);
-        let xDest = randomRange(0, image.width - patchWidth);
-        let yDest = randomRange(0, image.height - patchHeight);
+        let xDest = randomRange(0, image.width - patchWidth + 1);
+        let yDest = randomRange(0, image.height - patchHeight + 1);
 
         for (let yy = 0; yy < patchHeight; yy++) {
             for (let xx = 0; xx < patchWidth; xx++) {
@@ -184,7 +184,7 @@ class GeneticAlgorithm {
     }
 
     doIteration() {
-            console.log('Iteration ' + ++this.iteration);
+            this.iteration++;
 			let sortedIndividuals = this.population.getSortedIndividuals();
 			let children = [];
 			for (let i=0; i< ELITE; i++){
@@ -607,7 +607,9 @@ function startAlgorithm() {
         let fitness = ga.getBestSolution().fitness;
         allTimeBest.innerHTML = fitness;
         fitnesses[ga.iteration - 1] = fitness;
-        window.requestAnimationFrame(runAlgorithm);
+        if (ga.iteration < 5000) {
+            window.requestAnimationFrame(runAlgorithm);
+        }
     }
     runAlgorithm();
 }
