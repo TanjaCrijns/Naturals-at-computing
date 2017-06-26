@@ -188,7 +188,7 @@ class GeneticAlgorithm {
 			}
 			let parents = [];
 			for(let i = 0; i<(this.populationSize/2); i++) {
-				couple = this.doSelection();
+				let couple = this.doSelection();
 				parents.push(couple);
 			}
             let populationCount = 0;
@@ -196,7 +196,7 @@ class GeneticAlgorithm {
 			
 			for(let i = 0; i< parents.length; i++) {
 				let [parent1, parent2] = parents[i];
-				prob = Math.random();
+				let prob = Math.random();
 				if (prob <= this.crossoverRate) {
 					let [child1, child2] = this.crossover(parent1,parent2);
 				}
@@ -204,7 +204,7 @@ class GeneticAlgorithm {
 					let [child1, child2] = [parent1,parent2];
 				}
 				populationCount++;
-				prob = Math.random();
+				let prob = Math.random();
 				if (prob <= this.mutationRate) {
 					let copyAttemptImage = child1.getImage().copy();
 					this.mutate(copyAttemptImage);
@@ -220,7 +220,7 @@ class GeneticAlgorithm {
 					}
 				}
 				populationCount++;
-				prop = Math.random();
+				let prop = Math.random();
 				if (prob <= this.mutationRate) {
 					let copyAttemptImage = child2.getImage().copy();
 					this.mutate(copyAttemptImage);
