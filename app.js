@@ -4,6 +4,10 @@ let images = [
     'Monalisa',
     'Trump',
     'Circle',
+    'pontdugard',
+    'alps',
+    'clown',
+    'scream'
 ];
 
 let MIN_PATCH_SIZE = 5;
@@ -492,11 +496,15 @@ function showPlot() {
     let data = new google.visualization.DataTable();
     data.addColumn('number', 'Iteration');
     data.addColumn('number', 'Fitness');
+    let exportList = [];
     let i = 0;
     while (fitnesses[i] != 0) {
         data.addRow([i, fitnesses[i]]);
+        exportList.push(fitnesses[i]);
         i++;
     }
+
+    document.getElementById('export-text').value = '['+exportList.toString()+']';
 
     let chartOptions = {
         width: 500,
@@ -512,7 +520,7 @@ function showPlot() {
     chart.draw(data, chartOptions)
 }
 
-fitnesses = new Float32Array(1000000);
+fitnesses = new Float32Array(100000);
 
 function startAlgorithm() {
     let iterationNumber = document.getElementById('iteration-number');
