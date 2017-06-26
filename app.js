@@ -191,7 +191,6 @@ class GeneticAlgorithm {
 				couple = this.doSelection();
 				parents.push(couple);
 			}
-			let children = [];
             let populationCount = 0;
 			
 			
