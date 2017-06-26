@@ -263,14 +263,10 @@ class GeneticAlgorithm {
 	}
 	
     rankingSelection() {
-        let totalFitness = 0;
         let rankList = [];
         let individuals = this.population.getSortedIndividuals();
         let parents = [];
 
-        for (let i = 0; i < individuals.length; i++) {
-            totalFitness += individuals[i].getFitness();   
-        }
         for (let i = 0; i < individuals.length; i++) {
             rankList.push(1 / (i + 2));
         }
