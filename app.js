@@ -9,7 +9,7 @@ let images = [
 let MIN_PATCH_SIZE = 5;
 let MAX_PATCH_SIZE = 25;
 let IMAGE_SIZE = 200
-let NUMBER_OF_PARENTS = 20;
+let NUMBER_OF_PARENTS = 2;
 let ELITE = Math.floor(NUMBER_OF_PARENTS/2);
 let TOURNAMENT_SIZE = 10;
 
@@ -152,13 +152,14 @@ class Img {
 
 class GeneticAlgorithm {
 
-    constructor(populationSize, fitnessFunction, targetImage, sourceImage, attemptImage, mutationRate, selectionAlgo) {
+    constructor(populationSize, fitnessFunction, targetImage, sourceImage, attemptImage, mutationRate, crossoverRate, selectionAlgo) {
 		this.populationSize = populationSize;
 		this.fitnessFunction = fitnessFunction;
 		this.targetImage = targetImage;
 		this.population = new Population(attemptImage);
         this.sourceImage = sourceImage;
 		this.mutationRate = mutationRate;
+		this.crossoverRate = crossoverRate;
         this.numberOfParents = NUMBER_OF_PARENTS;
         this.numberOfChildren = this.populationSize/this.numberOfParents;
         this.iteration = 0;
@@ -180,9 +181,64 @@ class GeneticAlgorithm {
 
     doIteration() {
             console.log('Iteration ' + ++this.iteration);
-			let parents = this.doSelection();
+			sortedIndividuals = this.population.getSortedIndividuals();
+			let children = [];
+			for (i=0; i< ELITE; i++){
+				children.push(sortedIndividuals[i]);
+			}
+			let parents = [];
+			for(let i = 0; i<(this.populationSize/2); i++) {
+				couple = this.doSelection();
+				parents.push(couple);
+			}
 			let children = [];
             let populationCount = 0;
+			
+			
+			for(let i = 0; i< parents.length; i++) {
+				let [parent1, parent2] = parents[i];
+				prob = Math.random();
+				if (prob <= this.crossoverRate) {
+					let [child1, child2] = this.crossover(parent1,parent2);
+				}
+				else {
+					let [child1, child2] = [parent1,parent2];
+				}
+				populationCount++;
+				prob = Math.random();
+				if (prob <= this.mutationRate) {
+					let copyAttemptImage = child1.getImage().copy();
+					this.mutate(copyAttemptImage);
+					let child = new Individual(populationCount,copyAttemptImage,child1.getFitness());
+					if (children.length < this.populationSize){
+						children.push([populationCount,child]);
+					}
+				}
+				else {
+					child1.setId(populationCount);
+					if (children.length < this.populationSize){
+						children.push([populationCount, child1]);
+					}
+				}
+				populationCount++;
+				prop = Math.random();
+				if (prob <= this.mutationRate) {
+					let copyAttemptImage = child2.getImage().copy();
+					this.mutate(copyAttemptImage);
+					let child = new Individual(populationCount,copyAttemptImage,child2.getFitness());
+					if (children.length < this.populationSize) {
+						children.push(child);
+					}
+				}
+				else {
+					child2.setId(populationCount);
+					if (children.length < this.populationSize){
+						children.push([populationCount, child2]);
+					}
+				}
+			}
+			
+			/*
 			let numberOfMutationChildren = (this.populationSize*this.mutationRate)/this.numberOfParents;
 			for(let i = 0; i < parents.length; i++) {
 				for(let j = 0; j < numberOfMutationChildren; j++){
@@ -210,6 +266,7 @@ class GeneticAlgorithm {
                 child2.setId(populationCount);
                 children.push([populationCount,child2]);
 			}
+			*/
 			this.population.setPopulation(children);
 			this.evaluatePop();
 			let bestSolution = this.getBestSolution();
