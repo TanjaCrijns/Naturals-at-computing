@@ -181,7 +181,7 @@ class GeneticAlgorithm {
 
     doIteration() {
             console.log('Iteration ' + ++this.iteration);
-			sortedIndividuals = this.population.getSortedIndividuals();
+			let sortedIndividuals = this.population.getSortedIndividuals();
 			let children = [];
 			for (i=0; i< ELITE; i++){
 				children.push(sortedIndividuals[i]);
@@ -618,7 +618,8 @@ function startAlgorithm() {
     let selectionAlgo = algoElement.options[algoElement.selectedIndex].value;
     let populationSize = document.getElementById('population-size').value;
     let mutationRate = document.getElementById('mutation-rate').value;
-	ga = new GeneticAlgorithm(populationSize,fitness,destImage,sourceImage,attemptImage,mutationRate, selectionAlgo);
+	let crossoverRate = 0.8;
+	ga = new GeneticAlgorithm(populationSize,fitness,destImage,sourceImage,attemptImage,mutationRate, crossoverRate, selectionAlgo);
     let runAlgorithm = () => {
         ga.doIteration();
         iterationNumber.innerHTML = ga.iteration;
