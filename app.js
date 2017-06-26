@@ -185,17 +185,20 @@ class GeneticAlgorithm {
 
     doIteration() {
             console.log('Iteration ' + ++this.iteration);
+			let populationCount = 0;
 			let sortedIndividuals = this.population.getSortedIndividuals();
 			let children = [];
 			for (let i=0; i< ELITE; i++){
-				children.push(sortedIndividuals[i]);
+				populationCount++;
+				let child = sortedIndividuals[i];
+				child.setId(populationCount);
+				children.push([populationCount,sortedIndividuals[i]]);
 			}
 			let parents = [];
 			for(let i = 0; i<(this.populationSize/2); i++) {
 				let couple = this.doSelection();
 				parents.push(couple);
 			}
-            let populationCount = 0;
 			
 			
 			for(let i = 0; i< parents.length; i++) {
