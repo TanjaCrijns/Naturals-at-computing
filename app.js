@@ -228,7 +228,7 @@ class GeneticAlgorithm {
 					this.mutate(copyAttemptImage);
 					let child = new Individual(populationCount,copyAttemptImage,child2.getFitness());
 					if (children.length < this.populationSize) {
-						children.push(child);
+						children.push([populationCount,child]);
 					}
 				}
 				else {
