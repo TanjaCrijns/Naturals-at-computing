@@ -183,7 +183,7 @@ class GeneticAlgorithm {
             console.log('Iteration ' + ++this.iteration);
 			let sortedIndividuals = this.population.getSortedIndividuals();
 			let children = [];
-			for (i=0; i< ELITE; i++){
+			for (let i=0; i< ELITE; i++){
 				children.push(sortedIndividuals[i]);
 			}
 			let parents = [];
