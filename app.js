@@ -263,43 +263,22 @@ class GeneticAlgorithm {
 	}
 	
     rankingSelection() {
-        let totalFitness = 0;
         let rankList = [];
         let individuals = this.population.getSortedIndividuals();
         let parents = [];
 
         for (let i = 0; i < individuals.length; i++) {
-            totalFitness += individuals[i].getFitness();   
-        }
-        for (let i = 0; i < individuals.length; i++) {
-            rankList.push(1 / (i + 2));
+            rankList.push(i);
         }
         
-        for (let i = 0; i < (this.numberOfParents); i++) {
-            let idx = this.selectByRank(rankList);
+        for (let i = 0; i < this.numberOfParents; i++) {
+            let idx = this.selectByProportion(rankList);
             parents.push(individuals[idx]);
             individuals.splice(idx, 1);
             rankList.splice(idx, 1);
         }
 
         return parents;
-    }
-
-    selectByRank(rankList) {
-        let sum = 0;
-        for (let i = 0; i < rankList.length; i++) {
-            sum += rankList[i];
-        }
-        let randomNumber = sum * Math.random();
-        let choice = -1;
-        for (let i = 0; i < rankList.length; i++) {
-            randomNumber -= rankList[i];
-            if (randomNumber <= 0) {
-                choice = i ;
-                break; 
-            }
-        }
-        return choice;
     }
 
     rouletteSelection() {
@@ -315,7 +294,7 @@ class GeneticAlgorithm {
             proportionList.push(individuals[i].getFitness() / totalFitness);
         }
         
-        for (let i = 0; i < (this.numberOfParents); i++) {
+        for (let i = 0; i < this.numberOfParents; i++) {
             let idx = this.selectByProportion(proportionList);
             parents.push(individuals[idx]);
             individuals.splice(idx, 1);
