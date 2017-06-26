@@ -223,8 +223,8 @@ class GeneticAlgorithm {
 					}
 				}
 				else {
-					child1.setId(populationCount);
 					if (children.length < this.populationSize){
+						child1.setId(populationCount);
 						children.push([populationCount, child1]);
 					}
 				}
@@ -239,8 +239,8 @@ class GeneticAlgorithm {
 					}
 				}
 				else {
-					child2.setId(populationCount);
 					if (children.length < this.populationSize){
+						child2.setId(populationCount);
 						children.push([populationCount, child2]);
 					}
 				}
