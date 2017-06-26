@@ -222,7 +222,7 @@ class GeneticAlgorithm {
 					}
 				}
 				populationCount++;
-				prop = Math.random();
+				prob = Math.random();
 				if (prob <= this.mutationRate) {
 					let copyAttemptImage = child2.getImage().copy();
 					this.mutate(copyAttemptImage);
