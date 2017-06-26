@@ -4,10 +4,10 @@ let images = [
     'Monalisa',
     'Trump',
     'Circle',
-    'pontdugard',
-    'alps',
-    'clown',
-    'scream'
+    'Pontdugard',
+    'Alps',
+    'Clown',
+    'Scream'
 ];
 
 let MIN_PATCH_SIZE = 5;
