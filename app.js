@@ -204,7 +204,7 @@ class GeneticAlgorithm {
 					let [child1, child2] = [parent1,parent2];
 				}
 				populationCount++;
-				let prob = Math.random();
+				prob = Math.random();
 				if (prob <= this.mutationRate) {
 					let copyAttemptImage = child1.getImage().copy();
 					this.mutate(copyAttemptImage);
@@ -220,7 +220,7 @@ class GeneticAlgorithm {
 					}
 				}
 				populationCount++;
-				let prop = Math.random();
+				prop = Math.random();
 				if (prob <= this.mutationRate) {
 					let copyAttemptImage = child2.getImage().copy();
 					this.mutate(copyAttemptImage);
