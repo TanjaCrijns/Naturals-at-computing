@@ -166,6 +166,8 @@ class GeneticAlgorithm {
             this.doSelection = this.tournamentSelection;
         else if (selectionAlgo == 'roulette')
             this.doSelection = this.rouletteSelection;
+        else if (selectionAlgo == 'ranking')
+            this.doSelection = this.rankingSelection;
 		this.initializePop();
 		this.evaluatePop();
     }
@@ -225,6 +227,45 @@ class GeneticAlgorithm {
 		subRegionMutator.mutate(copyAttemptImage)
 	}
 	
+    rankingSelection() {
+        let totalFitness = 0;
+        let rankList = [];
+        let individuals = this.population.getSortedIndividuals();
+        let parents = individuals.splice(0, ELITE);
+
+        for (let i = 0; i < individuals.length; i++) {
+            totalFitness += individuals[i].getFitness();   
+        }
+        for (let i = 0; i < individuals.length; i++) {
+            rankList.push(1 / (i + 2));
+        }
+        
+        for (let i = 0; i < (this.numberOfParents - ELITE); i++) {
+            let idx = this.selectByRank(rankList);
+            parents.push(individuals[idx]);
+            individuals.splice(idx, 1);
+            rankList.splice(idx, 1);
+        }
+
+        return parents;
+    }
+
+    selectByRank(rankList) {
+        let sum = 0;
+        for (let i = 0; i < rankList.length; i++) {
+            sum += rankList[i];
+        }
+        let randomNumber = sum * Math.random();
+        let choice = -1;
+        for (let i = 0; i < rankList.length; i++) {
+            randomNumber -= rankList[i];
+            if (randomNumber <= 0) {
+                choice = i ;
+                break; 
+            }
+        }
+        return choice;
+    }
 
     rouletteSelection() {
         let totalFitness = 0;
