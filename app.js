@@ -197,11 +197,13 @@ class GeneticAlgorithm {
 			for(let i = 0; i< parents.length; i++) {
 				let [parent1, parent2] = parents[i];
 				let prob = Math.random();
+				let child1 = null;
+				let child2 = null;
 				if (prob <= this.crossoverRate) {
-					let [child1, child2] = this.crossover(parent1,parent2);
+					[child1, child2] = this.crossover(parent1,parent2);
 				}
 				else {
-					let [child1, child2] = [parent1,parent2];
+					[child1, child2] = [parent1,parent2];
 				}
 				populationCount++;
 				prob = Math.random();
